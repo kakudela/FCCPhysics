@@ -114,6 +114,7 @@ if __name__ == "__main__":
     bkgs = ['kkmcee_ee_uu_ecm240', 'kkmcee_ee_dd_ecm240', 'kkmcee_ee_cc_ecm240', 'kkmcee_ee_ss_ecm240', 'kkmcee_ee_bb_ecm240', 'kkmcee_ee_tautau_ecm240', 'kkmcee_ee_mumu_ecm240', 'kkmcee_ee_nuenue_ecm240', 'kkmcee_ee_numunumu_ecm240', 'kkmcee_ee_nutaunutau_ecm240', 'wzp6_ee_gammagamma_ecm240']
     bkgs = ['p8_ee_Zqq_ecm240']
     #bkgs = ['kkmcee_ee_uu_ecm240', 'kkmcee_ee_dd_ecm240', 'kkmcee_ee_cc_ecm240', 'kkmcee_ee_ss_ecm240', 'kkmcee_ee_bb_ecm240']
+    bkgs = ['wz3p6_ee_uu_ecm240', 'wz3p6_ee_dd_ecm240', 'wz3p6_ee_cc_ecm240', 'wz3p6_ee_ss_ecm240', 'wz3p6_ee_bb_ecm240', 'wz3p6_ee_tautau_ecm240', 'wz3p6_ee_mumu_ecm240', 'wz3p6_ee_nunu_ecm240', 'wzp6_ee_gammagamma_ecm240']
 
     hists = ['final_histo'] # 
     hists = ["vvqqqqa_final", "vvqqvva_final"]
