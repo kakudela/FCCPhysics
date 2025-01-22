@@ -22,7 +22,7 @@ inputDir = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/I
 procDict = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/samplesDict.json"
 
 # additional/custom C++ functions
-includePaths = ["../../functions/functions.h", "../../functions/functions_gen.h"]
+includePaths = ["../../functions/functions.h", "../../functions/functions_gen.h", "utils.h"]
 
 
 # output directory
@@ -112,6 +112,11 @@ def build_graph(df, dataset):
     # missing energy/mass
     df = df.Define("missingMass", "FCCAnalyses::missingMass(240., ReconstructedParticles)")
     hists.append(df.Histo1D(("missingMass", "", *bins_m), "missingMass"))
+
+    # get the WW decay
+    
+    df = df.Define("ww_decay_mode", "FCCAnalyses::ww_decay_mode(Particle, Particle1)")
+    hists.append(df.Histo1D(("ww_decay_mode", "", *(50, -25, 25)), "ww_decay_mode"))
 
 
     return hists, weightsum
