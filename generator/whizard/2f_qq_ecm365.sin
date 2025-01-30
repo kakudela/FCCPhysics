@@ -1,7 +1,7 @@
 
 model = SM
 
-sqrts = 240 GeV
+sqrts = 365 GeV
 
 alias uq = u:U
 alias dq = d:D
@@ -20,8 +20,8 @@ beams = e1, E1 => gaussian => isr
 #beams_pol_fraction = 30%, 80%
 
 
-gaussian_spread1 = 0.185%
-gaussian_spread2 = 0.185%
+gaussian_spread1 = 0.221%
+gaussian_spread2 = 0.221%
 
 
 ?isr_handler       = true
