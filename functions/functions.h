@@ -91,6 +91,18 @@ Vec_rp missingEnergy(float ecm, Vec_rp in, float p_cutoff = 0.0) {
     return ret;
 }
 
+// returns missing energy vector, based on reco particles
+float cosThetaMissingEnergy(Vec_rp in) {
+    float px = 0, py = 0, pz = 0;
+    for(auto &p : in) {
+        px += -p.momentum.x;
+        py += -p.momentum.y;
+        pz += -p.momentum.z;
+    }
+
+    return std::abs(pz) / std::sqrt(px*px + py*py + pz*pz);
+}
+
 // calculate the visible mass of the event
 float visibleMass(Vec_rp in, float p_cutoff = 0.0) {
     float px = 0, py = 0, pz = 0, e = 0;
@@ -160,43 +172,24 @@ Vec_f coneIsolation::coneIsolation::operator() (Vec_rp in, Vec_rp rps) {
     Vec_f result;
     result.reserve(in.size());
 
-    std::vector<ROOT::Math::PxPyPzEVector> lv_reco;
-    std::vector<ROOT::Math::PxPyPzEVector> lv_charged;
-    std::vector<ROOT::Math::PxPyPzEVector> lv_neutral;
-
-    for(size_t i = 0; i < rps.size(); ++i) {
-        ROOT::Math::PxPyPzEVector tlv;
-        tlv.SetPxPyPzE(rps.at(i).momentum.x, rps.at(i).momentum.y, rps.at(i).momentum.z, rps.at(i).energy);
-
-        if(rps.at(i).charge == 0) lv_neutral.push_back(tlv);
-        else lv_charged.push_back(tlv);
-    }
-
-    for(size_t i = 0; i < in.size(); ++i) {
-        ROOT::Math::PxPyPzEVector tlv;
-        tlv.SetPxPyPzE(in.at(i).momentum.x, in.at(i).momentum.y, in.at(i).momentum.z, in.at(i).energy);
-        lv_reco.push_back(tlv);
-    }
-
     // compute the isolation (see https://github.com/delphes/delphes/blob/master/modules/Isolation.cc#L154) 
-    for (auto & lv_reco_ : lv_reco) {
+    for(size_t i = 0; i < in.size(); ++i) {
+        ROOT::Math::PxPyPzEVector tlv_target;
+        tlv_target.SetPxPyPzE(in.at(i).momentum.x, in.at(i).momentum.y, in.at(i).momentum.z, in.at(i).energy);
         double sumNeutral = 0.0;
         double sumCharged = 0.0;
 
-        // charged
-        for (auto & lv_charged_ : lv_charged) {
-            double dr = coneIsolation::deltaR(lv_reco_.Eta(), lv_reco_.Phi(), lv_charged_.Eta(), lv_charged_.Phi());
-            if(dr > dr_min && dr < dr_max) sumCharged += lv_charged_.P();
-        }
-
-        // neutral
-        for (auto & lv_neutral_ : lv_neutral) {
-            double dr = coneIsolation::deltaR(lv_reco_.Eta(), lv_reco_.Phi(), lv_neutral_.Eta(), lv_neutral_.Phi());
-            if(dr > dr_min && dr < dr_max) sumNeutral += lv_neutral_.P();
+        for(size_t i = 0; i < rps.size(); ++i) {
+            ROOT::Math::PxPyPzEVector tlv;
+            tlv.SetPxPyPzE(rps.at(i).momentum.x, rps.at(i).momentum.y, rps.at(i).momentum.z, rps.at(i).energy);
+            double dr = coneIsolation::deltaR(tlv_target.Eta(), tlv_target.Phi(), tlv.Eta(), tlv.Phi());
+            if(dr < dr_min || dr > dr_max) continue;
+            if(rps.at(i).charge == 0) sumNeutral += tlv.P();
+            else sumCharged += tlv.P();
         }
 
         double sum = sumCharged + sumNeutral;
-        double ratio= sum / lv_reco_.P();
+        double ratio= sum / tlv_target.P();
         result.emplace_back(ratio);
     }
     return result;
@@ -223,6 +216,7 @@ Vec_rp sel_range::operator() (Vec_rp in, Vec_f prop) {
     }
     return result;
 }
+
 
 
 // filter reconstructed particles (in) based a property (prop) within a defined range (m_min, m_max)
@@ -273,15 +267,23 @@ Vec_rp resonanceBuilder_mass_recoil::resonanceBuilder_mass_recoil::operator()(Ve
     int n = legs.size();
 
     if(n > 1) {
+        /*
         ROOT::VecOps::RVec<bool> v(n);
         std::fill(v.end() - 2, v.end(), true); // helper variable for permutations
+        
+        int idx_1 = -1;
+        int idx_2 = -1;
         do {
             std::vector<int> pair;
             rp reso;
             reso.charge = 0;
-            TLorentzVector reso_lv; 
+            TLorentzVector reso_lv;
+            int idx_1_ = -1;
+            int idx_2_ = -1;
             for(int i = 0; i < n; ++i) {
                 if(v[i]) {
+                    if(idx_1_ == -1) idx_1_ = i;
+                    else idx_2_ = i;
                     pair.push_back(i);
                     reso.charge += legs[i].charge;
                     TLorentzVector leg_lv;
@@ -301,6 +303,48 @@ Vec_rp resonanceBuilder_mass_recoil::resonanceBuilder_mass_recoil::operator()(Ve
             }
 
             if(reso.charge != 0) continue; // neglect non-zero charge pairs
+            if(reso_lv.M() < (m_recoil_mass+1) && reso_lv.M() > (m_recoil_mass-1)) {
+                idx_1 = idx_1_;
+                idx_2 = idx_2_;
+                break;
+            }
+
+
+        } while(std::next_permutation(v.begin(), v.end()));
+        */
+        
+        ROOT::VecOps::RVec<bool> w(n);
+        std::fill(w.end() - 2, w.end(), true); // helper variable for permutations
+
+
+        do {
+            std::vector<int> pair;
+            rp reso;
+            reso.charge = 0;
+            TLorentzVector reso_lv; 
+            for(int i = 0; i < n; ++i) {
+                //if(i==idx_1 || i==idx_2) continue;
+                if(w[i]) {
+                    pair.push_back(i);
+                    reso.charge += legs[i].charge;
+                    TLorentzVector leg_lv;
+
+                    if(m_use_MC_Kinematics) { // MC kinematics
+                        int track_index = legs[i].tracks_begin;   // index in the Track array
+                        int mc_index = ReconstructedParticle2MC::getTrack2MC_index(track_index, recind, mcind, reco);
+                        if (mc_index >= 0 && mc_index < mc.size()) {
+                            leg_lv.SetXYZM(mc.at(mc_index).momentum.x, mc.at(mc_index).momentum.y, mc.at(mc_index).momentum.z, mc.at(mc_index).mass);
+                        }
+                    }
+                    else { // reco kinematics
+                         leg_lv.SetXYZM(legs[i].momentum.x, legs[i].momentum.y, legs[i].momentum.z, legs[i].mass);
+                    }
+                    reso_lv += leg_lv;
+                }
+            }
+
+            if(reso.charge != 0) continue; // neglect non-zero charge pairs
+            //if(reso_lv.M() < (m_recoil_mass+5) && reso_lv.M() > (m_recoil_mass-5)) continue; // avoid Higgs
             reso.momentum.x = reso_lv.Px();
             reso.momentum.y = reso_lv.Py();
             reso.momentum.z = reso_lv.Pz();
@@ -308,11 +352,20 @@ Vec_rp resonanceBuilder_mass_recoil::resonanceBuilder_mass_recoil::operator()(Ve
             result.emplace_back(reso);
             pairs.push_back(pair);
 
-        } while(std::next_permutation(v.begin(), v.end()));
+        } while(std::next_permutation(w.begin(), w.end()));
     }
     else {
-        std::cout << "ERROR: resonanceBuilder_mass_recoil, at least two leptons required." << std::endl;
-        exit(1);
+        //std::cout << "ERROR: resonanceBuilder_mass_recoil, at least two leptons required. RETURN DUMMY." << std::endl;
+        auto dummy = edm4hep::ReconstructedParticleData();
+        dummy.momentum.x = 0;
+        dummy.momentum.y = 0;
+        dummy.momentum.z = 0;
+        dummy.mass = 0;
+        result.emplace_back(dummy);
+        result.emplace_back(dummy);
+        result.emplace_back(dummy);
+        return result;
+        //exit(1);
     }
 
     if(result.size() > 1) {
@@ -356,8 +409,17 @@ Vec_rp resonanceBuilder_mass_recoil::resonanceBuilder_mass_recoil::operator()(Ve
             bestReso.emplace_back(l2);
         }
         else {
-            std::cout << "ERROR: resonanceBuilder_mass_recoil, no mininum found." << std::endl;
-            exit(1);
+            std::cout << "ERROR: resonanceBuilder_mass_recoil, no mininum found. RETURN DUMMY." << std::endl;
+            auto dummy = edm4hep::ReconstructedParticleData();
+            dummy.momentum.x = 0;
+            dummy.momentum.y = 0;
+            dummy.momentum.z = 0;
+            dummy.mass = 0;
+            result.emplace_back(dummy);
+            result.emplace_back(dummy);
+            result.emplace_back(dummy);
+            return result;
+            //exit(1);
         }
         return bestReso;
     }

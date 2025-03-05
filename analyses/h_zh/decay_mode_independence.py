@@ -1,0 +1,48 @@
+
+import ROOT
+import os
+
+def run_fit(cats, target, pert, extraArgs):
+    cmd = f"python FCCPhysics/analyses/h_zh/combine.py --cats {cats} --run  --target {target} --pert {pert} {extraArgs}"
+    os.system(cmd)
+
+    if '-' in cats:
+        fIn = ROOT.TFile("output/h_zh/combine/fit_output_combined.root") # combination
+    else:
+        fIn = ROOT.TFile(f"output/h_zh/combine/fit_output_{cats}.root") # single category
+    tree = fIn.Get("fitresults")
+    tree.GetEntry(0)
+    status = tree.status
+    errstatus = tree.errstatus
+    ZH_mu = tree.ZH_mu
+    ZH_mu_err = tree.ZH_mu_err
+
+    return [status, errstatus, ZH_mu, ZH_mu_err]
+
+if __name__ == "__main__":
+
+    extraArgs = "--freezeBackgrounds"
+    #extraArgs = "--floatBackgrounds"
+    extraArgs = ""
+    pert = 1.05
+    cats = "mumu-ee"
+    h_decays = ["bb", "cc", "gg", "ss", "mumu", "tautau", "ZZ", "WW", "Za", "aa", "inv"]
+
+    res = []
+    for h_decay in h_decays:
+        r = run_fit(cats, h_decay, pert, extraArgs)
+        res.append(r)
+
+
+    for i,h_decay in enumerate(h_decays):
+        status = res[i][0]
+        errstatus = res[i][0] = res[i][1]
+        ZH_mu = res[i][2]
+        ZH_mu_err = res[i][3]
+        bias = 100.*(ZH_mu - pert)
+
+        if status != 0 and errstatus != 0:
+            print(f"{h_decay}\tERROR: status={status} errstatus={errstatus}")
+        else:
+            print(f"{h_decay}\t{bias:.3f}")
+
