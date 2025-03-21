@@ -43,6 +43,17 @@ float acolinearity(Vec_rp in) {
     return std::acos(v1.Dot(v2)/(v1.Mag()*v2.Mag())*(-1.));
 }
 
+// acolinearity between two reco particles
+float acolinearity(Vec_tlv in) {
+    if(in.size() < 2) return -999;
+    auto p1 = in[0];
+    auto p2 = in[1];
+
+    TVector3 v1 = p1.Vect();
+    TVector3 v2 = p2.Vect();
+    return std::acos(v1.Dot(v2)/(v1.Mag()*v2.Mag())*(-1.));
+}
+
 // acoplanarity between two reco particles
 float acoplanarity(Vec_rp in) {
     if(in.size() < 2) return -999;
@@ -52,6 +63,19 @@ float acoplanarity(Vec_rp in) {
 
     TLorentzVector p2;
     p2.SetXYZM(in[1].momentum.x, in[1].momentum.y, in[1].momentum.z, in[1].mass);
+
+    float acop = abs(p1.Phi() - p2.Phi());
+    if(acop > M_PI) acop = 2 * M_PI - acop;
+    acop = M_PI - acop;
+
+    return acop;
+}
+
+// acoplanarity between two reco particles
+float acoplanarity(Vec_tlv in) {
+    if(in.size() < 2) return -999;
+    auto p1 = in[0];
+    auto p2 = in[1];
 
     float acop = abs(p1.Phi() - p2.Phi());
     if(acop > M_PI) acop = 2 * M_PI - acop;

@@ -91,6 +91,9 @@ def getHists(hName, procName):
         else:
             hist.Add(h)
         #fIn.Close()
+    if procName in proc_scales:
+        hist.Scale(proc_scales[procName])
+        print(f"SCALE {procName} with factor {proc_scales[procName]}")
     return hist
 
 
@@ -303,7 +306,7 @@ if __name__ == "__main__":
     sigma = 1
     bkg_unc = 1.01
 
-    z_decays = ["qq", "bb", "cc", "ss", "ee", "mumu"] # , "nunu" , "tautau"
+    z_decays = ["qq", "bb", "cc", "ss", "ee", "mumu", "nunu" , "tautau"]
     h_decays = ["bb", "cc", "gg", "ss", "mumu", "tautau", "ZZ", "WW", "Za", "aa", "inv"]
 
     bbb = " --binByBinStat" if args.bbb else ""
@@ -319,6 +322,38 @@ if __name__ == "__main__":
         "Zqqgamma"  : ['wz3p6_ee_uu_ecm240', 'wz3p6_ee_dd_ecm240', 'wz3p6_ee_cc_ecm240', 'wz3p6_ee_ss_ecm240', 'wz3p6_ee_bb_ecm240'],
         "Rare"      : ['wzp6_egamma_eZ_Zmumu_ecm240', 'wzp6_gammae_eZ_Zmumu_ecm240', 'wzp6_gaga_mumu_60_ecm240', 'wzp6_egamma_eZ_Zee_ecm240', 'wzp6_gammae_eZ_Zee_ecm240', 'wzp6_gaga_ee_60_ecm240', 'wzp6_gaga_tautau_60_ecm240', 'wzp6_ee_nuenueZ_ecm240'],
     }
+
+    procs_scales_250 = {
+        "ZH": 1.048,
+        "WW": 0.971,
+        "ZZ": 0.939,
+        "Zgamma": 0.919,
+    }
+    
+    procs_scales_polL = {
+        "ZH": 1.554,
+        "WW": 2.166,
+        "ZZ": 1.330,
+        "Zgamma": 1.263,
+    }
+    
+    procs_scales_polR = {
+        "ZH": 1.047,
+        "WW": 0.219,
+        "ZZ": 1.011,
+        "Zgamma": 1.018,
+    }
+    
+    proc_scales = procs_scales_250 ## change fit to ASIMOV -t -1 !!!
+    #proc_scales = {}
+
+    #sigs = ['wzp6_ee_mumuH_ecm240']
+    #bkgs = ['p8_ee_WW_ecm240', 'p8_ee_ZZ_ecm240', 'wzp6_ee_tautau_ecm240', 'wzp6_ee_mumu_ecm240']
+    #sigs_scales, bkgs_scales = [1.554], [2.166, 1.330, 1.263, 1.263] # 250 + polL
+    #sigs_scales, bkgs_scales = [1.047], [0.219, 1.011, 1.018, 1.018] # 250 + polR
+    #sigs_scales, bkgs_scales = [1.048], [0.971, 0.939, 0.919, 0.919] # 250
+    #sigs_scales, bkgs_scales = [1.0], [1.0, 1.0, 1.0, 1.0] # 240
+
 
     cats = args.cats.split('-')
     p = -1 if args.floatBackgrounds else 1
@@ -343,10 +378,20 @@ if __name__ == "__main__":
 
         if cat == "ee" or cat == "mumu":
             #procs_cfg["ZH"] = [f'wzp6_ee_{x}H_H{y}_ecm240' for x in [cat] for y in h_decays]
-            inputDir = "output/h_zh_leptonic/histmaker/ecm240/"
-            hName, rebin = f'{cat}_recoil_m_mva', 1 # final config
-            #hName, rebin = f'{cat}_mva_score', 1 # MVA score 100 bins
+            
+            # NOMINAL
+            #inputDir = "output/h_zh_leptonic/histmaker/ecm240/mrec_100_150/"
+            
+            # WITH COS THETA MISS
+            inputDir = "output/h_zh_leptonic/histmaker/ecm240/WithCosThetaMiss/"
+            hName, rebin = f'{cat}_zll_recoil', 50 # recoil 0.5 GeV bins
+            
+
+            # WITHOUT COS THETA MISS
+            #inputDir = "output/h_zh_leptonic/histmaker/ecm240/mrec_100_150/"
             #hName, rebin = f'{cat}_zll_recoil', 50 # recoil 0.5 GeV bins
+
+            #hName, rebin = f'{cat}_mva_score', 1 # MVA score 100 bins
             procs = ["ZH", "WW", "ZZ", "Zgamma", "Rare"] # first must be signal
             proc_idx = [0, p*1, p*2, p*3, p*4]
 
@@ -384,13 +429,14 @@ if __name__ == "__main__":
         dc += "process      {}\n".format('\t'.join([str(idx) for idx in proc_idx]))
         dc += "rate         {}\n".format('\t'.join(['-1']*len(procs)))
         dc += "####################\n"
-        dc += "dummy lnN    1.000000005 {}\n".format('\t'.join(['-']*(len(procs)-1)))
         if not args.freezeBackgrounds and not args.floatBackgrounds:
             for i,proc in enumerate(procs):
                 if i == 0: continue # no signal
                 str_before = '\t'.join(['-']*(i-1))
                 str_after = '\t'.join(['-']*(len(procs)-i-1))
                 dc += f"norm_{proc} lnN - {str_before}\t {bkg_unc} \t {str_after}\n"
+        else:
+            dc += "dummy lnN    1.000000005 {}\n".format('\t'.join(['-']*(len(procs)-1)))
         #dc += "* autoMCStats 0 0 1\n"
 
         f = open(f"{outDir}/datacard_{cat}.txt", 'w')

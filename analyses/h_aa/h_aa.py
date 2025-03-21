@@ -32,18 +32,7 @@ if ecm == 240:
         'wz3p6_ee_ee_Mee_30_150_ecm240':    {'fraction':fraction},
         'wz3p6_ee_nunu_ecm240':             {'fraction':fraction},
     }
-    processList = {
-        'wzp6_ee_nunuH_Haa_ecm240':         {'fraction':1},
-        'wzp6_ee_eeH_Haa_ecm240':           {'fraction':1},
-        'wzp6_ee_tautauH_Haa_ecm240':       {'fraction':1},
-        'wzp6_ee_ccH_Haa_ecm240':           {'fraction':1},
-        'wzp6_ee_bbH_Haa_ecm240':           {'fraction':1},
-        'wzp6_ee_qqH_Haa_ecm240':           {'fraction':1},
-        'wzp6_ee_ssH_Haa_ecm240':           {'fraction':1},
-        'wzp6_ee_mumuH_Haa_ecm240':         {'fraction':1},
-        'wzp6_ee_nuenueH_Haa_ecm240':       {'fraction':fraction},
-        'wzp6_ee_numunumuH_Haa_ecm240':     {'fraction':fraction},
-    }
+
 
 if ecm == 365:
     processList = {
@@ -65,19 +54,6 @@ if ecm == 365:
         'wz3p6_ee_mumu_ecm365':             {'fraction':fraction},
         'wz3p6_ee_ee_Mee_30_150_ecm365':    {'fraction':fraction},
         'wz3p6_ee_nunu_ecm365':             {'fraction':fraction},
-        'wzp6_ee_nuenueH_Haa_ecm365':       {'fraction':fraction},
-        'wzp6_ee_numunumuH_Haa_ecm365':     {'fraction':fraction},
-    }
-
-    processList = {
-        'wzp6_ee_nunuH_Haa_ecm365':         {'fraction':1},
-        'wzp6_ee_eeH_Haa_ecm365':           {'fraction':1},
-        'wzp6_ee_tautauH_Haa_ecm365':       {'fraction':1},
-        'wzp6_ee_ccH_Haa_ecm365':           {'fraction':1},
-        'wzp6_ee_bbH_Haa_ecm365':           {'fraction':1},
-        'wzp6_ee_qqH_Haa_ecm365':           {'fraction':1},
-        'wzp6_ee_ssH_Haa_ecm365':           {'fraction':1},
-        'wzp6_ee_mumuH_Haa_ecm365':         {'fraction':1},
         'wzp6_ee_nuenueH_Haa_ecm365':       {'fraction':fraction},
         'wzp6_ee_numunumuH_Haa_ecm365':     {'fraction':fraction},
     }

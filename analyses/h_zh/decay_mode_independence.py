@@ -25,7 +25,7 @@ if __name__ == "__main__":
     #extraArgs = "--floatBackgrounds"
     extraArgs = ""
     pert = 1.05
-    cats = "mumu-ee"
+    cats = "qq-mumu-ee"
     h_decays = ["bb", "cc", "gg", "ss", "mumu", "tautau", "ZZ", "WW", "Za", "aa", "inv"]
 
     res = []

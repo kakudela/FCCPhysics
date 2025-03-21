@@ -123,7 +123,7 @@ def makeCutFlow(hName="cutFlow", cuts=[], labels=[], sig_scale=1.0, yMin=1e6, yM
     canvas.SetGrid()
     canvas.SetTicks()
     dummy = plotter.dummy(len(cuts))
-    dummy.GetXaxis().SetLabelSize(0.8*dummy.GetXaxis().GetLabelSize())
+    dummy.GetXaxis().SetLabelSize(0.75*dummy.GetXaxis().GetLabelSize())
     dummy.GetXaxis().SetLabelOffset(1.3*dummy.GetXaxis().GetLabelOffset())
     for i,label in enumerate(labels): dummy.GetXaxis().SetBinLabel(i+1, label)
     dummy.GetXaxis().LabelsOption("u")
@@ -277,6 +277,7 @@ def makeCutFlowHiggsDecays(hName="cutFlow", outName="", cuts=[], cut_labels=[], 
         xMin, xMax = 68, 74
         if len(z_decays) > 1:
             xMin, xMax = 0, 5
+        xMin, xMax = 0, 100
     if args.cat == "ee":
         xMin, xMax = 58, 66
         if len(z_decays) > 1:
@@ -377,7 +378,7 @@ def makeCutFlowHiggsDecays(hName="cutFlow", outName="", cuts=[], cut_labels=[], 
     canvas.SaveAs(f"{outDir}/higgsDecays/{outName}_finalSelection.pdf")
 
 
-def makePlotHiggsDecays(hName, outName="", xMin=0, xMax=100, yMin=1, yMax=1e5, xLabel="xlabel", yLabel="Events", logX=False, logY=True, rebin=1):
+def makePlotHiggsDecays(hName, outName="", xMin=0, xMax=100, yMin=1, yMax=1e5, xLabel="", yLabel="Events", logX=False, logY=True, rebin=1, xLabels=[]):
 
     if outName == "":
         outName = hName
@@ -432,7 +433,12 @@ def makePlotHiggsDecays(hName, outName="", xMin=0, xMax=100, yMin=1, yMax=1e5, x
 
     plotter.cfg = cfg
     canvas = plotter.canvas()
-    dummy = plotter.dummy()
+    dummy = plotter.dummy(1 if len(xLabels) == 0 else len(xLabels))
+    if len(xLabels) > 0:
+        dummy.GetXaxis().SetLabelSize(0.8*dummy.GetXaxis().GetLabelSize())
+        dummy.GetXaxis().SetLabelOffset(1.3*dummy.GetXaxis().GetLabelOffset())
+        for i,label in enumerate(xLabels): dummy.GetXaxis().SetBinLabel(i+1, label)
+        dummy.GetXaxis().LabelsOption("u")
     dummy.Draw("HIST") 
 
     for i,hist in enumerate(hists):
@@ -533,7 +539,7 @@ def makePlotSignalRatios(hName, outName="", xMin=0, xMax=100, yMin=1, yMax=1e5, 
     canvas.Close()
 
 
-def makePlot(hName, outName="", xMin=0, xMax=100, yMin=1, yMax=1e5, xLabel="xlabel", yLabel="Events", logX=False, logY=True, rebin=1, legPos=[0.3, 0.75, 0.9, 0.9], sig_scale=1):
+def makePlot(hName, outName="", xMin=0, xMax=100, yMin=1, yMax=1e5, xLabel="xlabel", yLabel="Events", logX=False, logY=True, rebin=1, legPos=[0.3, 0.75, 0.9, 0.9], sig_scale=1, xLabels=[]):
 
     if outName == "":
         outName = hName
@@ -601,8 +607,13 @@ def makePlot(hName, outName="", xMin=0, xMax=100, yMin=1, yMax=1e5, xLabel="xlab
 
     plotter.cfg = cfg
     canvas = plotter.canvas()
-    dummy = plotter.dummy()
-    dummy.Draw("HIST") 
+    dummy = plotter.dummy(1 if len(xLabels) == 0 else len(xLabels))
+    if len(xLabels) > 0:
+        dummy.GetXaxis().SetLabelSize(0.8*dummy.GetXaxis().GetLabelSize())
+        dummy.GetXaxis().SetLabelOffset(1.3*dummy.GetXaxis().GetLabelOffset())
+        for i,label in enumerate(xLabels): dummy.GetXaxis().SetBinLabel(i+1, label)
+        dummy.GetXaxis().LabelsOption("u")
+    dummy.Draw("HIST")
     st.Draw("HIST SAME")
 
     h_bkg_tot.SetLineColor(ROOT.kBlack)
@@ -802,7 +813,7 @@ if __name__ == "__main__":
 
     if cat == "qq":
 
-        inputDir = f"output/h_zh_hadronic/histmaker/ecm{ecm}/final/"
+        inputDir = f"output/h_zh_hadronic/histmaker/ecm{ecm}/"
         outDir = f"/home/submit/jaeyserm/public_html/fccee/h_zh_hadronic/plots_ecm{ecm}/"
 
         z_decays = ["qq", "bb", "cc", "ss"]
@@ -810,10 +821,12 @@ if __name__ == "__main__":
         if ecm == 365: h_decays = h_decays_no_mumu
 
         cuts = ["cut0", "cut1", "cut2", "cut3", "cut4", "cut5", "cut6", "cut7", "cut8", "cut9"]
-        labels = ["All events", "Veto leptonic", "Clustering", "m(qq)", "p(qq)", "cos(qq)", "acol", "acop", "WW", "cos(#thetamiss)"]
+        cut_labels = ["All events", "Veto leptonic", "Clustering", "40 < m_{qq} < 140", "20 < p_{qq} < 90", "cos(qq) < 0.85", "acol > 0.35", "acop (none)", "WW pair mass", "|cos#theta_{miss}| < 0.995"]
 
-        makeCutFlowHiggsDecays("cutFlow", cuts=cuts, cut_labels=labels, yMin=40, yMax=150, h_decays=h_decays, h_decays_labels=h_decays_labels, h_decays_colors=h_decays_colors)
-        makeCutFlow("cutFlow", cuts, labels, 100.)
+
+        makeCutFlowHiggsDecays("cutFlow", cuts=cuts, cut_labels=cut_labels, yMin=40, yMax=150, z_decays=z_decays, h_decays=h_decays, h_decays_labels=h_decays_labels, h_decays_colors=h_decays_colors)
+        makeCutFlow("cutFlow", cuts, cut_labels, 100.)
+
 
 
         # significance
@@ -839,7 +852,8 @@ if __name__ == "__main__":
             significance("mva_score", 0, 0.9)
             significance("mva_score", 0, 1, reverse=True)
 
-        makePlotHiggsDecays("best_clustering_idx_nosel", xMin=-2, xMax=5, yMin=1e-5, yMax=1e3, xLabel="best_clustering_idx_nosel", yLabel="Events", logY=True)
+        makePlotHiggsDecays("best_clustering_idx_nosel", xMin=-1, xMax=4, yMin=0, yMax=1.5, xLabels=["No pairs", "Inclusive", "Exclusive N=2", "Exclusive N=4", "Exclusive N=6"], yLabel="Events", logY=False)
+
         makePlotHiggsDecays("zqq_m_best_nosel", xMin=0, xMax=200, yMin=1e-5, yMax=10, xLabel="zqq_m_best_nosel", yLabel="Events", logY=True)
         makePlotHiggsDecays("zqq_p_best_nosel", xMin=0, xMax=200, yMin=1e-5, yMax=10, xLabel="zqq_p_best_nosel", yLabel="Events", logY=True)
         makePlotHiggsDecays("zqq_recoil_m_best_nosel", xMin=0, xMax=200, yMin=1e-5, yMax=10, xLabel="zqq_recoil_m_best_nosel", yLabel="Events", logY=True)
@@ -870,7 +884,7 @@ if __name__ == "__main__":
         makePlot("zqq_m_best_nosel", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="m_{qq} (GeV)", yLabel="Events", logY=True, rebin=1)
         makePlot("zqq_p_best_nosel", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="p_{qq} (GeV)", yLabel="Events", logY=True, rebin=1)
         makePlot("zqq_recoil_m_best_nosel", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="Recoil qq (GeV)", yLabel="Events", logY=True, rebin=1)
-        makePlot("best_clustering_idx_nosel", xMin=-2, xMax=5, yMin=1e-1, yMax=-1, xLabel="best_clustering_idx_nosel", yLabel="Events", logY=True, rebin=1)
+        makePlot("best_clustering_idx_nosel", xMin=-1, xMax=4, yMin=1e2, yMax=-1, xLabel="", xLabels=["No pairs", "Inclusive", "Exclusive N=2", "Exclusive N=4", "Exclusive N=6"], yLabel="Events", logY=True, rebin=1)
         makePlot("z_costheta_nosel", xMin=0, xMax=1, yMin=1e-1, yMax=-1, xLabel="cos(#theta_{qq})", yLabel="Events", logY=True, rebin=1)
 
 
@@ -920,7 +934,7 @@ if __name__ == "__main__":
 
     if cat == "ee" or cat == "mumu":
 
-        inputDir = f"output/h_zh_leptonic/histmaker/ecm{ecm}/"
+        inputDir = f"output/h_zh_leptonic/histmaker/ecm{ecm}/WithCosThetaMiss/"
         outDir = f"/home/submit/jaeyserm/public_html/fccee/h_zh_leptonic/plots_{cat}_ecm{ecm}/"
 
 
@@ -930,8 +944,8 @@ if __name__ == "__main__":
         #procs = ["ZnunuH", "WW", "ZZ", "Zgamma", "Rare"] # first must be signal
         #procs = ["ZqqH", "WW", "ZZ", "Zgamma", "Rare"] # first must be signal
 
-        cuts = ["cut0", "cut1", "cut2", "cut3", "cut4", "cut5"] # , "cut6"
-        cut_labels = ["All events", "#geq 1 #mu^{#pm} + ISO", "#geq 2 #mu^{#pm} + OS", "86 < m_{#mu^{+}#mu^{#minus}} < 96", "20 < p_{#mu^{+}#mu^{#minus}} < 70", "120 < m_{rec} < 150", "|cos#theta_{miss}| < 0.98"]
+        cuts = ["cut0", "cut1", "cut2", "cut3", "cut4", "cut5", "cut6"] # , "cut6"
+        cut_labels = ["All events", "#geq 1 #mu^{#pm} + ISO", "#geq 2 #mu^{#pm} + OS", "86 < m_{#mu^{+}#mu^{#minus}} < 96", "20 < p_{#mu^{+}#mu^{#minus}} < 70", "100 < m_{rec} < 150", "|cos#theta_{miss}| < 0.98"]
 
         makeCutFlow(f"{cat}_cutFlow", cuts, cut_labels, sig_scale=100., yMin=1e4, yMax=1e10)
         makeCutFlowHiggsDecays(f"{cat}_cutFlow", outName="cutFlow", cuts=cuts, cut_labels=cut_labels, yMin=40, yMax=150, z_decays=z_decays, h_decays=h_decays, h_decays_labels=h_decays_labels, h_decays_colors=h_decays_colors)
@@ -953,7 +967,7 @@ if __name__ == "__main__":
         makePlotHiggsDecays(f"{cat}_zll_m_nOne", outName="zll_m_nOne", xMin=0, xMax=150, yMin=1e-5, yMax=1e3, xLabel="m(ll) (GeV)", yLabel="Events", logY=True)
         makePlotHiggsDecays(f"{cat}_zll_p_nOne", outName="zll_p_nOne", xMin=0, xMax=150, yMin=1e-5, yMax=1e3, xLabel="p(ll) (GeV)", yLabel="Events", logY=True)
         makePlotHiggsDecays(f"{cat}_zll_recoil_m_final", outName="zll_recoil_m_final", xMin=120, xMax=130, yMin=1e-5, yMax=100, xLabel="Recoil (GeV)", yLabel="Events", logY=True)
-        makePlotHiggsDecays(f"{cat}_cosThetaMiss_nOne", outName="cosThetaMiss_nOne", xMin=0.95, xMax=1, yMin=1e-5, yMax=1, xLabel="Recoil (GeV)", yLabel="Events", logY=True)
+        makePlotHiggsDecays(f"{cat}_cosThetaMiss_nOne", outName="cosThetaMiss_nOne", xMin=0.95, xMax=1, yMin=1e-5, yMax=1, xLabel="|cos#theta_{miss}|", yLabel="Events", logY=True, rebin=2)
         makePlotHiggsDecays(f"{cat}_mva_score", outName="mva_score", xMin=0, xMax=1, yMin=1e-4, yMax=1e1, xLabel="MVA score", yLabel="Events", logY=True, rebin=10)
         makePlotHiggsDecays(f"{cat}_acoplanarity", outName="acoplanarity", xMin=0, xMax=5, yMin=1e-5, yMax=1e3, xLabel="m(ll) (GeV)", yLabel="Events", logY=True)
         makePlotHiggsDecays(f"{cat}_acolinearity", outName="acolinearity", xMin=0, xMax=5, yMin=1e-5, yMax=1e3, xLabel="p(ll) (GeV)", yLabel="Events", logY=True)
@@ -963,9 +977,9 @@ if __name__ == "__main__":
         makePlot(f"{cat}_zll_p_nOne", "zll_p_nOne", xMin=0, xMax=150, yMin=1e-3, yMax=-1, xLabel="p(ll) (GeV)", yLabel="Events", logY=True, rebin=1)
         makePlot(f"{cat}_zll_recoil_nOne", "zll_recoil_nOne", xMin=100, xMax=150, yMin=0, yMax=-1, xLabel="Recoil (GeV)", yLabel="Events", logY=False, rebin=1)
         makePlot(f"{cat}_zll_recoil_m_final", "zll_recoil_m_final", xMin=120, xMax=130, yMin=0, yMax=-1, xLabel="Recoil (GeV)", yLabel="Events", logY=False, rebin=1)
-        makePlot(f"{cat}_mva_score", "mva_score", xMin=0, xMax=1, yMin=1e-3, yMax=1e5, xLabel="MVA score", yLabel="Events", logY=True, rebin=1)
-        makePlot(f"{cat}_zll_recoil_m_mva_low", "zll_recoil_m_mva_low", xMin=120, xMax=150, yMin=0, yMax=-1, xLabel="Recoil (GeV)", yLabel="Events", logY=False, rebin=1)
-        makePlot(f"{cat}_zll_recoil_m_mva_high", "zll_recoil_m_mva_high", xMin=120, xMax=150, yMin=0, yMax=-1, xLabel="Recoil (GeV)", yLabel="Events", logY=False, rebin=1)
+        makePlot(f"{cat}_mva_score", "mva_score", xMin=0, xMax=1, yMin=1e0, yMax=1e5, xLabel="MVA score", yLabel="Events", logY=True, rebin=1)
+        makePlot(f"{cat}_zll_recoil_m_mva_low", "zll_recoil_m_mva_low", xMin=100, xMax=150, yMin=0, yMax=-1, xLabel="Recoil (GeV)", yLabel="Events", logY=False, rebin=1)
+        makePlot(f"{cat}_zll_recoil_m_mva_high", "zll_recoil_m_mva_high", xMin=100, xMax=150, yMin=0, yMax=-1, xLabel="Recoil (GeV)", yLabel="Events", logY=False, rebin=1)
         
         
         

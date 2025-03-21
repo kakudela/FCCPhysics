@@ -221,8 +221,8 @@ processListSignalRare = {
 
 
 processList = processListSignal | processListSignalRare | processBkg
-processList = processListSignal # | processBkg
-processList = processBkg
+processList = processListSignal | processBkg
+#processList = processBkg
 
 inputDir = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
 procDict = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/samplesDict.json"
@@ -232,7 +232,7 @@ includePaths = ["../../functions/functions.h", "../../functions/functions_gen.h"
 
 
 # output directory
-outputDir   = f"output/h_zh_leptonic/histmaker/ecm{ecm}/"
+outputDir   = f"output/h_zh_leptonic/histmaker/ecm{ecm}/mrec_100_150/"
 
 
 # optional: ncpus, default is 4, -1 uses all cores available
@@ -268,6 +268,7 @@ bins_m_fine = (100, 120, 130) # 100 MeV bins
 
 ROOT.EnableImplicitMT(nCPUS) # hack to deal correctly with TMVAHelperXGB
 tmva_helper_mumu = TMVAHelperXGB("FCCPhysics/analyses/h_zh/trainings/xgb_bdt_mumu_converted.root", "ZH_Recoil_BDT")
+#tmva_helper_mumu = TMVAHelperXGB("FCCPhysics/analyses/h_zh/trainings/xgb_bdt_mumu_new_v0_converted.root", "ZH_Recoil_BDT")
 tmva_helper_ee = TMVAHelperXGB("FCCPhysics/analyses/h_zh/trainings/xgb_bdt_ee_converted.root", "ZH_Recoil_BDT")
 
 def build_graph_ll(df, hists, dataset, ch):
@@ -396,7 +397,7 @@ def build_graph_ll(df, hists, dataset, ch):
     #########
     hists.append(df.Histo1D((f"{ch}_zll_recoil_nOne", "", *bins_recoil), "zll_recoil_m"))
     #df = df.Filter("zll_recoil_m < 140 && zll_recoil_m > 120")
-    df = df.Filter("zll_recoil_m < 150 && zll_recoil_m > 120")
+    df = df.Filter("zll_recoil_m < 150 && zll_recoil_m > 100") # 120
     hists.append(df.Histo1D((f"{ch}_cutFlow", "", *bins_count), "cut5"))
 
 
@@ -443,7 +444,7 @@ def build_graph_ll(df, hists, dataset, ch):
 
     mva_sign = 0.83 if ch == "mumu" else 0.88 # max significance
     bins_mva_ = [0, mva_sign, 1]
-    bins_mrec_ = list(np.arange(120, 150.5, 0.5))
+    bins_mrec_ = list(np.arange(100, 150.5, 0.5))
     bins_mva = array.array('d', bins_mva_)
     bins_mrec = array.array('d', bins_mrec_)
     model = ROOT.RDF.TH2DModel(f"{ch}_recoil_m_mva", "", len(bins_mrec_)-1, bins_mrec, len(bins_mva_)-1, bins_mva)

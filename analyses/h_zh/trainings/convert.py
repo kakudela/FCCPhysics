@@ -1,8 +1,8 @@
 
 import ROOT
 
-fIn = "FCCPhysics/analyses/h_zh/trainings/xgb_bdt_ee.root"
-fOutName = "FCCPhysics/analyses/h_zh/trainings/xgb_bdt_ee_converted.root"
+fIn = "FCCPhysics/analyses/h_zh/trainings/xgb_bdt_mumu_new_v0.root"
+fOutName = "FCCPhysics/analyses/h_zh/trainings/xgb_bdt_mumu_new_v0_converted.root" # first make a copy of the original file
 
 variables = ["zll_leading_p", "zll_leading_theta", "zll_subleading_p", "zll_subleading_theta", "acolinearity", "acoplanarity", "zll_m", "zll_p", "zll_theta"]
 
