@@ -625,9 +625,10 @@ def significanceold(hName, xMin=-10000, xMax=10000, reverse=False):
     canvas.Close()
 
 
-def significance(hName, xMin=-10000, xMax=10000, reverse=False):
+def significance(hName, xMin=-10000, xMax=10000, reverse=False, rebin=1):
 
     h_sig = getHist(hName, procs_cfg[procs[0]])
+    h_sig.Rebin(rebin)
     sig_tot = h_sig.Integral()
 
     bkgs_procs = []
@@ -635,6 +636,7 @@ def significance(hName, xMin=-10000, xMax=10000, reverse=False):
         bkgs_procs.extend(procs_cfg[bkg])
 
     h_bkg = getHist(hName, bkgs_procs)
+    h_bkg.Rebin(rebin)
     x, y, l = [], [], []
 
     for i in range(1, h_sig.GetNbinsX()+1):
@@ -721,7 +723,7 @@ if __name__ == "__main__":
     cat = args.cat
     lumi = "10.8" if ecm == 240 else "3"
 
-    inputDir = f"output/h_za/histmaker/ecm{ecm}/"
+    inputDir = f"output/h_za/histmaker/ecm{ecm}_{cat}/"
     baseOutDir = f"/home/submit/jaeyserm/public_html/fccee/h_za/plots_{cat}_ecm{ecm}/"
     outDir = baseOutDir
 
@@ -796,20 +798,23 @@ if __name__ == "__main__":
     else:
         procs_cfg = procs_cfg_365
 
-    
+
     if cat == "qqvv":
 
         #procs = ["Za", "Zgamma", "gaga"]
         #procs = ["Za", "ZZ", "ZgammaHadr", "ZgammaTau", "ZgammaLept", "gaga"]
         procs = ["qqvvZa", "ZZ", "Zgamma", "gaga"] # 240
         procs = ["ZHZa", "ZZ", "Zgamma", "gaga"] # 365
-        procs = ["VBFZa", "ZZ", "Zgamma", "gaga"] # 365
 
         # cutflow
-        cuts = ["cut0", "cut1", "cut2", "cut3", "cut4", "cut5", "cut6", "cut7", "cut8", "cut9", "cut10", "cut11"]
-        labels = ["All events", "#geq 1 #gamma", "1 #gamma", "#gamma iso", "#gamma cos(#theta) < 0.85", "cos#theta_{miss} < 0.995", "Lepton veto", "Missing mass", "d_{12}", "2 jets", "Jet ID", "m_{qq}"]
+        if ecm == 240:
+            cuts = ["cut0", "cut1", "cut2", "cut3", "cut4", "cut5", "cut6", "cut7", "cut8", "cut9", "cut10", "cut11"]
+            labels = ["All events", "#geq 1 #gamma", "1 #gamma", "#gamma iso", "#gamma cos(#theta) < 0.85", "cos#theta_{miss} < 0.995", "Lepton veto", "Missing mass", "d_{12}", "2 jets", "Jet ID", "m_{qq}"]
+        if ecm == 365:
+            cuts = ["cut0", "cut1", "cut2", "cut3", "cut4", "cut5", "cut6", "cut7", "cut8", "cut9", "cut10", "cut11"]
+            labels = ["All events", "1 #gamma", "#gamma iso", "#gamma cos(#theta) < 0.85", "cos#theta_{miss} < 0.995", "Lepton veto", "Missing mass", "d_{12}", "2 jets", "Jet ID", "m_{qq}"]
         #makeCutFlow()
-        makeCutFlow(hName="qqvv_cutFlow", cuts=cuts, labels=labels, sig_scale=100, yMin=1e1, yMax=1e10)
+        makeCutFlow(hName="cutFlow", cuts=cuts, labels=labels, sig_scale=100, yMin=1e1, yMax=1e10)
 
         # significance
         if True:
@@ -821,8 +826,8 @@ if __name__ == "__main__":
             significance("leading_photon_p_nOne", 0, 100, reverse=True)
             
             
-            significance("photon_iso_nOne", 0, 1.5)
-            significance("photon_iso_nOne", 0, 1.5, reverse=True)
+            significance("photon_iso_nOne", 0, 2)
+            significance("photon_iso_nOne", 0, 2, reverse=True)
             significance("photon_costheta_nOne", 0.5, 1, reverse=True)
             significance("cosThetaEmiss_nOne", 0.9, 1, reverse=True)
             
@@ -830,13 +835,13 @@ if __name__ == "__main__":
             significance("missingMass_nOne", 50, 150)
             significance("missingMass_nOne", 50, 150, reverse=True)
             
-            significance("qqvv_dmerge_12", 0, 5000)
+            significance("dmerge_12", 0, 5000)
             
-            significance("qqvv_qq_m_nOne", 50, 150)
-            significance("qqvv_qq_m_nOne", 50, 150, reverse=True)
+            significance("qq_m_nOne", 50, 150)
+            significance("qq_m_nOne", 50, 150, reverse=True)
             
-            #significance("qqvv_mva_score_split_chi2", 0, 1)
-            #significance("qqvv_mva_score_split_chi2", 0, 1, reverse=True)
+            #significance("mva_score_split_chi2", 0, 1)
+            #significance("mva_score_split_chi2", 0, 1, reverse=True)
 
 
 
@@ -850,37 +855,37 @@ if __name__ == "__main__":
         makePlot("missingMass_nOne", xMin=0, xMax=220 if ecm==240 else 400, yMin=1e-1, yMax=-1, xLabel="Missing mass (GeV)",logY=True)
 
 
-        makePlot("qqvv_dmerge_01", xMin=0, xMax=1000, yMin=1e-1, yMax=-1, xLabel="d_{01}", logY=True, rebin=100)
-        makePlot("qqvv_dmerge_12", xMin=0, xMax=15000, yMin=1e-1, yMax=-1, xLabel="d_{12}", logY=True, rebin=100)
-        makePlot("qqvv_dmerge_23", xMin=0, xMax=5000, yMin=1e-1, yMax=-1, xLabel="d_{23}", logY=True, rebin=100)
+        makePlot("dmerge_01", xMin=0, xMax=1000, yMin=1e-1, yMax=-1, xLabel="d_{01}", logY=True, rebin=100)
+        makePlot("dmerge_12", xMin=0, xMax=15000, yMin=1e-1, yMax=-1, xLabel="d_{12}", logY=True, rebin=100)
+        makePlot("dmerge_23", xMin=0, xMax=5000, yMin=1e-1, yMax=-1, xLabel="d_{23}", logY=True, rebin=100)
 
 
-        makePlot("qqvv_jets_n_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="jets_n_nOne", logY=True)
-        makePlot("qqvv_jet1_p_nOne", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Leading jet momentum (GeV)", logY=True)
-        makePlot("qqvv_jet2_p_nOne", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Subleading jet momentum (GeV)", logY=True)
-        makePlot("qqvv_jet1_nc_nOne", xMin=0, xMax=75, yMin=1e-1, yMax=-1, xLabel="Leading jet constituents", logY=True)
-        makePlot("qqvv_jet2_nc_nOne", xMin=0, xMax=75, yMin=1e-1, yMax=-1, xLabel="Subleading jet constituents", logY=True)
+        makePlot("jets_n_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="jets_n_nOne", logY=True)
+        makePlot("jet1_p_nOne", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Leading jet momentum (GeV)", logY=True)
+        makePlot("jet2_p_nOne", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Subleading jet momentum (GeV)", logY=True)
+        makePlot("jet1_nc_nOne", xMin=0, xMax=75, yMin=1e-1, yMax=-1, xLabel="Leading jet constituents", logY=True)
+        makePlot("jet2_nc_nOne", xMin=0, xMax=75, yMin=1e-1, yMax=-1, xLabel="Subleading jet constituents", logY=True)
 
 
-        makePlot("qqvv_qq_m_nOne", xMin=40, xMax=150, yMin=1e-1, yMax=-1, xLabel="m_{qq} (GeV)", logY=True)
-        makePlot("qqvv_qq_costheta_nOne", xMin=0, xMax=1, yMin=1e-1, yMax=-1, xLabel="qq_costheta_nOne", logY=True)
-        makePlot("qqvv_qqa_recoil_m_nOne", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqa_recoil_m_nOne", logY=True)
-        makePlot("qqvv_vva_recoil_m_nOne", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_vva_recoil_m_nOne", logY=True)
+        makePlot("qq_m_nOne", xMin=40, xMax=150, yMin=1e-1, yMax=-1, xLabel="m_{qq} (GeV)", logY=True)
+        makePlot("qq_costheta_nOne", xMin=0, xMax=1, yMin=1e-1, yMax=-1, xLabel="qq_costheta_nOne", logY=True)
+        makePlot("qqa_recoil_m_nOne", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqa_recoil_m_nOne", logY=True)
+        makePlot("vva_recoil_m_nOne", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="vva_recoil_m_nOne", logY=True)
 
 
-        makePlot("qqvv_qq_p", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qq_p", logY=True)
-        makePlot("qqvv_qqa_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqa invariant mass (GeV)", logY=True)
-        makePlot("qqvv_qqa_p", xMin=0, xMax=100, yMin=1e-1, yMax=-1, xLabel="qqa momentum (GeV)", logY=True)
-        makePlot("qqvv_qq_recoil_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qq_recoil_m", logY=True)
+        makePlot("qq_p", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qq_p", logY=True)
+        makePlot("qqa_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqa invariant mass (GeV)", logY=True)
+        makePlot("qqa_p", xMin=0, xMax=100, yMin=1e-1, yMax=-1, xLabel="qqa momentum (GeV)", logY=True)
+        makePlot("qq_recoil_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qq_recoil_m", logY=True)
         
-        makePlot("qqvv_vva_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="vva_m", logY=True)
-        makePlot("qqvv_vva_p", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="vva_p", logY=True)
-        makePlot("qqvv_vv_recoil_m",  xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="vv_recoil_m", logY=True)
+        makePlot("vva_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="vva_m", logY=True)
+        makePlot("vva_p", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="vva_p", logY=True)
+        makePlot("vv_recoil_m",  xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="vv_recoil_m", logY=True)
 
-        makePlot("qqvv_vv_trans",  xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_vv_trans", logY=True)
-        makePlot("qqvv_qq_trans",  xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_qq_trans", logY=True)
-        makePlot("qqvv_vv_long",  xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_vv_long", logY=True)
-        makePlot("qqvv_qq_long",  xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_qq_long", logY=True)
+        makePlot("vv_trans",  xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="vv_trans", logY=True)
+        makePlot("qq_trans",  xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qq_trans", logY=True)
+        makePlot("vv_long",  xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="vv_long", logY=True)
+        makePlot("qq_long",  xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qq_long", logY=True)
 
 
         # all photon plots
@@ -906,92 +911,92 @@ if __name__ == "__main__":
 
         ### chi2 pairing
         outDir = f"{baseOutDir}/pairing_chi2/"
-        makePlot("qqvv_H_m", xMin=100, xMax=150, yMin=1e-1, yMax=-1, xLabel="Higgs candidate invariant mass (GeV)", logY=True)
-        makePlot("qqvv_H_p", xMin=0, xMax=100, yMin=1e-1, yMax=-1, xLabel="Higgs candidate momentum (GeV)", logY=True)
-        makePlot("qqvv_Z_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Associated Z candidate invariant mass (GeV)", logY=True)
-        makePlot("qqvv_Z_p", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Associated Z candidate momentum (GeV)", logY=True)
-        makePlot("qqvv_ZH_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_ZH_m", logY=True)
-        makePlot("qqvv_ZH_p", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_ZH_p", logY=True)
-        makePlot("qqvv_H_recoil_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Higgs candidate recoil mass (GeV)", logY=True)
-        makePlot("qqvv_H_recoil_p", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_H_recoil_p", logY=True)
-        makePlot("qqvv_Z_recoil_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Associated Z candidate recoil mass (GeV)", logY=True)
-        makePlot("qqvv_Z_recoil_p", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_Z_recoil_p", logY=True)
-        makePlot("qqvv_mass_difference_H_Z", xMin=-50, xMax=100, yMin=1e-1, yMax=-1, xLabel="qqvv_mass_difference_H_Z", logY=True)
-        makePlot("qqvv_mva_score_split_chi2", xMin=0, xMax=1, yMin=1e-1, yMax=-1, xLabel="MVA score", logY=True, rebin=10)
+        makePlot("H_m", xMin=100, xMax=150, yMin=1e-1, yMax=-1, xLabel="Higgs candidate invariant mass (GeV)", logY=True)
+        makePlot("H_p", xMin=0, xMax=100, yMin=1e-1, yMax=-1, xLabel="Higgs candidate momentum (GeV)", logY=True)
+        makePlot("Z_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Associated Z candidate invariant mass (GeV)", logY=True)
+        makePlot("Z_p", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Associated Z candidate momentum (GeV)", logY=True)
+        makePlot("ZH_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="ZH_m", logY=True)
+        makePlot("ZH_p", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="ZH_p", logY=True)
+        makePlot("H_recoil_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Higgs candidate recoil mass (GeV)", logY=True)
+        makePlot("H_recoil_p", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="H_recoil_p", logY=True)
+        makePlot("Z_recoil_m", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Associated Z candidate recoil mass (GeV)", logY=True)
+        makePlot("Z_recoil_p", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="Z_recoil_p", logY=True)
+        makePlot("mass_difference_H_Z", xMin=-50, xMax=100, yMin=1e-1, yMax=-1, xLabel="mass_difference_H_Z", logY=True)
+        makePlot("mva_score_split_chi2", xMin=0, xMax=1, yMin=1e-1, yMax=-1, xLabel="MVA score", logY=True, rebin=10)
 
 
         quit()
         ### chi2 splitting
         outDir = f"{baseOutDir}/splitting_chi2/hqqa"
-        makePlot("qqvv_hqqa_qqa_m_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_hqqa_qqa_m_chi2", logY=True)
-        makePlot("qqvv_hqqa_qqa_p_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_hqqa_qqa_p_chi2", logY=True)
-        makePlot("qqvv_hqqa_qqa_recoil_m_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_hqqa_qqa_recoil_m_chi2", logY=True)
-        makePlot("qqvv_hqqa_final_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_hqqa_final_chi2", logY=True)
-        makePlot("qqvv_hqqa_mass_difference_qqa_vv_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_hqqa_mass_difference_qqa_vv_chi2", logY=True)
-        makePlot("qqvv_hqqa_mass_difference_vva_qq_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_hqqa_mass_difference_vva_qq_chi2", logY=True)
+        makePlot("hqqa_qqa_m_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="hqqa_qqa_m_chi2", logY=True)
+        makePlot("hqqa_qqa_p_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="hqqa_qqa_p_chi2", logY=True)
+        makePlot("hqqa_qqa_recoil_m_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="hqqa_qqa_recoil_m_chi2", logY=True)
+        makePlot("hqqa_final_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="hqqa_final_chi2", logY=True)
+        makePlot("hqqa_mass_difference_qqa_vv_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="hqqa_mass_difference_qqa_vv_chi2", logY=True)
+        makePlot("hqqa_mass_difference_vva_qq_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="hqqa_mass_difference_vva_qq_chi2", logY=True)
 
         outDir = f"{baseOutDir}/splitting_chi2/hvva"
-        makePlot("qqvv_hvva_qq_p_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_hvva_qq_p_chi2", logY=True)
-        makePlot("qqvv_hvva_qq_recoil_m_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_hvva_qq_recoil_m_chi2", logY=True)
-        makePlot("qqvv_hvva_final_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_hvva_final_chi2", logY=True)
-        makePlot("qqvv_hvva_mass_difference_qqa_vv_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_hqqa_mass_difference_qqa_vv_chi2", logY=True)
-        makePlot("qqvv_hvva_mass_difference_vva_qq_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="qqvv_hqqa_mass_difference_vva_qq_chi2", logY=True)
+        makePlot("hvva_qq_p_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="hvva_qq_p_chi2", logY=True)
+        makePlot("hvva_qq_recoil_m_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="hvva_qq_recoil_m_chi2", logY=True)
+        makePlot("hvva_final_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="hvva_final_chi2", logY=True)
+        makePlot("hvva_mass_difference_qqa_vv_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="hqqa_mass_difference_qqa_vv_chi2", logY=True)
+        makePlot("hvva_mass_difference_vva_qq_chi2", xMin=0, xMax=250, yMin=1e-1, yMax=-1, xLabel="hqqa_mass_difference_vva_qq_chi2", logY=True)
 
 
         ### MVA splitting
         outDir = f"{baseOutDir}/splitting_mva/hqqa"
 
-        makePlot("qqvv_hqqa_qq_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_qq_m_mva", logY=True)
-        makePlot("qqvv_hqqa_qq_p_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_qq_p_mva", logY=True)
-        makePlot("qqvv_hqqa_qqa_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_qqa_m_mva", logY=True)
-        makePlot("qqvv_hqqa_qqa_p_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_qqa_p_mva", logY=True)
-        makePlot("qqvv_hqqa_qq_recoil_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_qq_recoil_m_mva", logY=True)
-        makePlot("qqvv_hqqa_qqa_recoil_za_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_qqa_recoil_za_m_mva", logY=True)
+        makePlot("hqqa_qq_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_qq_m_mva", logY=True)
+        makePlot("hqqa_qq_p_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_qq_p_mva", logY=True)
+        makePlot("hqqa_qqa_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_qqa_m_mva", logY=True)
+        makePlot("hqqa_qqa_p_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_qqa_p_mva", logY=True)
+        makePlot("hqqa_qq_recoil_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_qq_recoil_m_mva", logY=True)
+        makePlot("hqqa_qqa_recoil_za_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_qqa_recoil_za_m_mva", logY=True)
 
-        makePlot("qqvv_hqqa_vv_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_vv_m_mva", logY=True)
-        makePlot("qqvv_hqqa_vva_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_vva_m_mva", logY=True)
-        makePlot("qqvv_hqqa_vva_p_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_vva_p_mva", logY=True)
-        makePlot("qqvv_hqqa_vv_recoil_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_vv_recoil_m_mva", logY=True)
+        makePlot("hqqa_vv_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_vv_m_mva", logY=True)
+        makePlot("hqqa_vva_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_vva_m_mva", logY=True)
+        makePlot("hqqa_vva_p_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_vva_p_mva", logY=True)
+        makePlot("hqqa_vv_recoil_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hqqa_vv_recoil_m_mva", logY=True)
 
-        makePlot("qqvv_hqqa_mass_difference_qqa_vv_mva", xMin=-50, xMax=100, yMin=1e-1, yMax=-1, xLabel="hqqa_mass_difference_qqa_vv",logY=True)
-        makePlot("qqvv_hqqa_mass_difference_vva_qq_mva", xMin=-50, xMax=100, yMin=1e-1, yMax=-1, xLabel="hqqa_mass_difference_vva_qq",logY=True)
+        makePlot("hqqa_mass_difference_qqa_vv_mva", xMin=-50, xMax=100, yMin=1e-1, yMax=-1, xLabel="hqqa_mass_difference_qqa_vv",logY=True)
+        makePlot("hqqa_mass_difference_vva_qq_mva", xMin=-50, xMax=100, yMin=1e-1, yMax=-1, xLabel="hqqa_mass_difference_vva_qq",logY=True)
 
 
-        makePlot("qqvv_hqqa_dr_vv_qqa_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hqqa_dr_vv_qqa_nOne", logY=True)
-        makePlot("qqvv_hqqa_dr_qq_vva_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hqqa_dr_qq_vva_nOne", logY=True)
-        makePlot("qqvv_hqqa_dr_a_qq_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hqqa_dr_a_qq_nOne", logY=True)
-        makePlot("qqvv_hqqa_dr_a_vv_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hqqa_dr_a_vv_nOne", logY=True)
+        makePlot("hqqa_dr_vv_qqa_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hqqa_dr_vv_qqa_nOne", logY=True)
+        makePlot("hqqa_dr_qq_vva_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hqqa_dr_qq_vva_nOne", logY=True)
+        makePlot("hqqa_dr_a_qq_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hqqa_dr_a_qq_nOne", logY=True)
+        makePlot("hqqa_dr_a_vv_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hqqa_dr_a_vv_nOne", logY=True)
 
-        makePlot("qqvv_hqqa_mva_score", xMin=0, xMax=1, yMin=1e-2, yMax=-1, xLabel="hqqa_mva_score", logY=True)
-        makePlot("qqvv_hqqa_final_1D_mva", xMin=110, xMax=140, yMin=1e-1, yMax=-1, xLabel="hqqa_final_1D_mva", logY=True)
+        makePlot("hqqa_mva_score", xMin=0, xMax=1, yMin=1e-2, yMax=-1, xLabel="hqqa_mva_score", logY=True)
+        makePlot("hqqa_final_1D_mva", xMin=110, xMax=140, yMin=1e-1, yMax=-1, xLabel="hqqa_final_1D_mva", logY=True)
 
 
 
 
 
         outDir = f"{baseOutDir}/splitting_mva/hvva"
-        makePlot("qqvv_hvva_qq_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_qq_m_mva", logY=True)
-        makePlot("qqvv_hvva_qq_p_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_qq_p_mva", logY=True)
-        makePlot("qqvv_hvva_qqa_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_qqa_m_mva", logY=True)
-        makePlot("qqvv_hvva_qqa_p_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_qqa_p_mva", logY=True)
-        makePlot("qqvv_hvva_qq_recoil_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_qq_recoil_m_mva", logY=True)
-        makePlot("qqvv_hvva_qqa_recoil_za_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_qqa_recoil_za_m_mva", logY=True)
+        makePlot("hvva_qq_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_qq_m_mva", logY=True)
+        makePlot("hvva_qq_p_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_qq_p_mva", logY=True)
+        makePlot("hvva_qqa_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_qqa_m_mva", logY=True)
+        makePlot("hvva_qqa_p_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_qqa_p_mva", logY=True)
+        makePlot("hvva_qq_recoil_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_qq_recoil_m_mva", logY=True)
+        makePlot("hvva_qqa_recoil_za_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_qqa_recoil_za_m_mva", logY=True)
 
-        makePlot("qqvv_hvva_vv_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_vv_m_mva", logY=True)
-        makePlot("qqvv_hvva_vva_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_vva_m_mva", logY=True)
-        makePlot("qqvv_hvva_vva_p_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_vva_p_mva", logY=True)
-        makePlot("qqvv_hvva_vv_recoil_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_vv_recoil_m_mva", logY=True)
+        makePlot("hvva_vv_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_vv_m_mva", logY=True)
+        makePlot("hvva_vva_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_vva_m_mva", logY=True)
+        makePlot("hvva_vva_p_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_vva_p_mva", logY=True)
+        makePlot("hvva_vv_recoil_m_mva", xMin=0, xMax=200, yMin=1e-1, yMax=-1, xLabel="hvva_vv_recoil_m_mva", logY=True)
 
-        makePlot("qqvv_hvva_mass_difference_qqa_vv_mva", xMin=-50, xMax=100, yMin=1e-1, yMax=-1, xLabel="hvva_mass_difference_qqa_vv",logY=True)
-        makePlot("qqvv_hvva_mass_difference_vva_qq_mva", xMin=-50, xMax=100, yMin=1e-1, yMax=-1, xLabel="",logY=True)
+        makePlot("hvva_mass_difference_qqa_vv_mva", xMin=-50, xMax=100, yMin=1e-1, yMax=-1, xLabel="hvva_mass_difference_qqa_vv",logY=True)
+        makePlot("hvva_mass_difference_vva_qq_mva", xMin=-50, xMax=100, yMin=1e-1, yMax=-1, xLabel="",logY=True)
 
-        makePlot("qqvv_hvva_dr_vv_qqa_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hvva_dr_vv_qqa_nOne", logY=True)
-        makePlot("qqvv_hvva_dr_qq_vva_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hvva_dr_qq_vva_nOne", logY=True)
-        makePlot("qqvv_hvva_dr_a_qq_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hvva_dr_a_qq_nOne", logY=True)
-        makePlot("qqvv_hvva_dr_a_vv_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hvva_dr_a_vv_nOne", logY=True)
+        makePlot("hvva_dr_vv_qqa_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hvva_dr_vv_qqa_nOne", logY=True)
+        makePlot("hvva_dr_qq_vva_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hvva_dr_qq_vva_nOne", logY=True)
+        makePlot("hvva_dr_a_qq_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hvva_dr_a_qq_nOne", logY=True)
+        makePlot("hvva_dr_a_vv_nOne", xMin=0, xMax=5, yMin=1e-1, yMax=-1, xLabel="hvva_dr_a_vv_nOne", logY=True)
 
-        makePlot("qqvv_hvva_mva_score", xMin=0, xMax=1, yMin=1e-2, yMax=-1, xLabel="hvva_mva_score", logY=True)
-        makePlot("qqvv_hvva_final_1D_mva", xMin=110, xMax=140, yMin=1e-1, yMax=-1, xLabel="hvva_final_1D_mva", logY=True)
+        makePlot("hvva_mva_score", xMin=0, xMax=1, yMin=1e-2, yMax=-1, xLabel="hvva_mva_score", logY=True)
+        makePlot("hvva_final_1D_mva", xMin=110, xMax=140, yMin=1e-1, yMax=-1, xLabel="hvva_final_1D_mva", logY=True)
 
 
 
@@ -1014,8 +1019,8 @@ if __name__ == "__main__":
             #significance("photons_veto_n", 0, 10, reverse=True)
             #significance("photons_veto_costheta", 0, 1, reverse=True)
             
-            #significance("leading_photon_p_nOne", 0, 100)
-            #significance("leading_photon_p_nOne", 0, 100, reverse=True)
+            significance("leading_photon_p_nOne", 0, 100)
+            significance("leading_photon_p_nOne", 0, 100, reverse=True)
             
             
             #significance("photon_iso_nOne", 0, 1.5)
@@ -1028,6 +1033,7 @@ if __name__ == "__main__":
             significance("cos_qqa_nOne", 0.5, 1, reverse=True)
             
             significance("vv_trans_nOne", 0, 50)
+            significance("mva_score", 0, 1, rebin=10)
             
             # vv missing mass optimization
             #significance("missingMass_nOne", 50, 150)
@@ -1035,11 +1041,11 @@ if __name__ == "__main__":
             
             #
             
-            #significance("qqvv_qq_m_nOne", 50, 150)
-            #significance("qqvv_qq_m_nOne", 50, 150, reverse=True)
+            #significance("qq_m_nOne", 50, 150)
+            #significance("qq_m_nOne", 50, 150, reverse=True)
             
-            #significance("qqvv_mva_score_split_chi2", 0, 1)
-            #significance("qqvv_mva_score_split_chi2", 0, 1, reverse=True)
+            #significance("mva_score_split_chi2", 0, 1)
+            #significance("mva_score_split_chi2", 0, 1, reverse=True)
 
 
 
@@ -1087,34 +1093,6 @@ if __name__ == "__main__":
        
         makePlot("cos_qqa_nOne", xMin=0, xMax=1, yMin=1e-1, yMax=-1, xLabel="cos_qqa", logY=True, rebin=10)
         makePlot("cos_qq", xMin=0, xMax=1, yMin=1e-1, yMax=-1, xLabel="cos_qq", logY=True, rebin=10)
-
-
-        quit()
-
-        makePlot("vbf_vv_trans",  xMin=0, xMax=250, yMin=1e-2, yMax=-1, xLabel="vbf_vv_trans", logY=True)
-        makePlot("vbf_qq_trans",  xMin=0, xMax=250, yMin=1e-2, yMax=-1, xLabel="vbf_qq_trans", logY=True)
-        makePlot("vbf_vv_long",  xMin=0, xMax=250, yMin=1e-2, yMax=-1, xLabel="vbf_vv_long", logY=True)
-        makePlot("vbf_qq_long",  xMin=0, xMax=250, yMin=1e-2, yMax=-1, xLabel="vbf_qq_long", logY=True)
-
-
-        # all photon plots
-        outDir = f"{baseOutDir}/photons_all"
-        makePlot("photons_all_p", xMin=0, xMax=100, yMin=1e-1, yMax=-1, xLabel="photons_all_p", logY=True)
-        makePlot("photons_all_n", xMin=0, xMax=10, yMin=1e-1, yMax=-1, xLabel="photons_all_n", logY=True)
-        makePlot("photons_all_costheta", xMin=0, xMax=1, yMin=1e-1, yMax=-1, xLabel="photons_all_costheta", logY=True)
-
-        # photon plots
-        outDir = f"{baseOutDir}/photons"
-        makePlot("photons_p", xMin=0, xMax=100, yMin=1e-1, yMax=-1, xLabel="photons_p", logY=True)
-        makePlot("photons_n", xMin=0, xMax=10, yMin=1e-1, yMax=-1, xLabel="photons_n", logY=True)
-        makePlot("photons_costheta", xMin=0, xMax=1, yMin=1e-1, yMax=-1, xLabel="photons_costheta", logY=True)
-
-        # veto photon plots
-        outDir = f"{baseOutDir}/photons_veto"
-        makePlot("photons_veto_p", xMin=0, xMax=100, yMin=1e-1, yMax=-1, xLabel="photons_veto_p", logY=True)
-        makePlot("photons_veto_n", xMin=0, xMax=10, yMin=1e-1, yMax=-1, xLabel="photons_veto_n", logY=True)
-        makePlot("photons_veto_costheta", xMin=0.8, xMax=1, yMin=1e-3, yMax=-1, xLabel="photons_veto_costheta", logY=True, rebin=10)
-
 
 
 

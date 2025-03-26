@@ -8,6 +8,7 @@ ROOT.gStyle.SetOptTitle(0)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--cats", type=str, help="Category (qq, mumu, ee)")
+parser.add_argument("--ecm", type=int, help="Center-of-mass energy", default=240)
 parser.add_argument("--run", help="Run combine", action='store_true')
 parser.add_argument("--bbb", help="Enable bin-by-bin statistics (BB)", action='store_true')
 parser.add_argument("--target", type=str, help="Target pseudodata", default="bb")
@@ -240,7 +241,7 @@ def make_pseudodata(procs, target="bb", variation=1.0):
     for h_decay in h_decays:
         xsec = 0.
         for z_decay in z_decays:
-            proc = f'wzp6_ee_{z_decay}H_H{h_decay}_ecm240'
+            proc = f'wzp6_ee_{z_decay}H_H{h_decay}_ecm{ecm}'
             if not proc in sigProcs:
                 continue
             xsec += getMetaInfo(proc)
@@ -275,7 +276,7 @@ def make_pseudodata(procs, target="bb", variation=1.0):
         xsec = 0.
         hist = None
         for z_decay in z_decays:
-            proc = f'wzp6_ee_{z_decay}H_H{h_decay}_ecm240'
+            proc = f'wzp6_ee_{z_decay}H_H{h_decay}_ecm{ecm}'
             if not proc in sigProcs:
                 continue
             xsec += getMetaInfo(proc)
@@ -301,6 +302,7 @@ def make_pseudodata(procs, target="bb", variation=1.0):
 
 if __name__ == "__main__":
 
+    ecm = args.ecm
     outDir = "output/h_zh/combine/"
     plot_dir = "/home/submit/jaeyserm/public_html/fccee/h_zh/combine_smoothing/"
     sigma = 1
@@ -311,7 +313,7 @@ if __name__ == "__main__":
 
     bbb = " --binByBinStat" if args.bbb else ""
 
-    procs_cfg = {
+    procs_cfg_240 = {
         "ZH"        : [f'wzp6_ee_{x}H_H{y}_ecm240' for x in z_decays for y in h_decays],
         "ZqqH"      : [f'wzp6_ee_{x}H_H{y}_ecm240' for x in ["qq", "bb", "cc", "ss"] for y in h_decays],
         "ZmumuH"    : [f'wzp6_ee_{x}H_H{y}_ecm240' for x in ["mumu"] for y in h_decays],
@@ -322,6 +324,23 @@ if __name__ == "__main__":
         "Zqqgamma"  : ['wz3p6_ee_uu_ecm240', 'wz3p6_ee_dd_ecm240', 'wz3p6_ee_cc_ecm240', 'wz3p6_ee_ss_ecm240', 'wz3p6_ee_bb_ecm240'],
         "Rare"      : ['wzp6_egamma_eZ_Zmumu_ecm240', 'wzp6_gammae_eZ_Zmumu_ecm240', 'wzp6_gaga_mumu_60_ecm240', 'wzp6_egamma_eZ_Zee_ecm240', 'wzp6_gammae_eZ_Zee_ecm240', 'wzp6_gaga_ee_60_ecm240', 'wzp6_gaga_tautau_60_ecm240', 'wzp6_ee_nuenueZ_ecm240'],
     }
+
+    procs_cfg_365 = {
+        "ZH"        : [f'wzp6_ee_{x}H_H{y}_ecm365' for x in z_decays for y in h_decays],
+        "ZqqH"      : [f'wzp6_ee_{x}H_H{y}_ecm365' for x in ["qq", "bb", "cc", "ss"] for y in h_decays],
+        "ZmumuH"    : [f'wzp6_ee_{x}H_H{y}_ecm365' for x in ["mumu"] for y in h_decays],
+        "ZeeH"      : [f'wzp6_ee_{x}H_H{y}_ecm365' for x in ["ee"] for y in h_decays],
+        "WW"        : ['p8_ee_WW_ecm365', 'p8_ee_WW_mumu_ecm365', 'p8_ee_WW_ee_ecm365'], # p8_ee_WW_mumu_ecm365 p8_ee_WW_ecm365
+        "ZZ"        : ['p8_ee_ZZ_ecm365'],
+        "Zgamma"    : ['wz3p6_ee_tautau_ecm365', 'wz3p6_ee_mumu_ecm365', 'wz3p6_ee_ee_Mee_30_150_ecm365', 'wz3p6_ee_uu_ecm365', 'wz3p6_ee_dd_ecm365', 'wz3p6_ee_cc_ecm365', 'wz3p6_ee_ss_ecm365', 'wz3p6_ee_bb_ecm365', 'wz3p6_ee_nunu_ecm365'],
+        "Zqqgamma"  : ['wz3p6_ee_uu_ecm365', 'wz3p6_ee_dd_ecm365', 'wz3p6_ee_cc_ecm365', 'wz3p6_ee_ss_ecm365', 'wz3p6_ee_bb_ecm365'],
+        "Rare"      : ['wzp6_egamma_eZ_Zmumu_ecm365', 'wzp6_gammae_eZ_Zmumu_ecm365', 'wzp6_gaga_mumu_60_ecm365', 'wzp6_egamma_eZ_Zee_ecm365', 'wzp6_gammae_eZ_Zee_ecm365', 'wzp6_gaga_ee_60_ecm365', 'wzp6_gaga_tautau_60_ecm365', 'wzp6_ee_nuenueZ_ecm365'],
+    }
+
+    if ecm == 240:
+        procs_cfg = procs_cfg_240
+    if ecm == 365:
+        procs_cfg = procs_cfg_365
 
     procs_scales_250 = {
         "ZH": 1.048,
@@ -345,14 +364,8 @@ if __name__ == "__main__":
     }
     
     proc_scales = procs_scales_250 ## change fit to ASIMOV -t -1 !!!
-    #proc_scales = {}
+    proc_scales = {}
 
-    #sigs = ['wzp6_ee_mumuH_ecm240']
-    #bkgs = ['p8_ee_WW_ecm240', 'p8_ee_ZZ_ecm240', 'wzp6_ee_tautau_ecm240', 'wzp6_ee_mumu_ecm240']
-    #sigs_scales, bkgs_scales = [1.554], [2.166, 1.330, 1.263, 1.263] # 250 + polL
-    #sigs_scales, bkgs_scales = [1.047], [0.219, 1.011, 1.018, 1.018] # 250 + polR
-    #sigs_scales, bkgs_scales = [1.048], [0.971, 0.939, 0.919, 0.919] # 250
-    #sigs_scales, bkgs_scales = [1.0], [1.0, 1.0, 1.0, 1.0] # 240
 
 
     cats = args.cats.split('-')
@@ -360,8 +373,9 @@ if __name__ == "__main__":
     for cat in cats:
         hists = []
         if cat == "qq":
-            inputDir = "output/h_zh_hadronic/histmaker/ecm240/"
+            inputDir = f"output/h_zh_hadronic/histmaker/ecm{ecm}/"
             hName = 'zqq_recoil_m_mqq_mva' # zqq_recoil_m zqq_recoil_m_mqq mva_score
+            #hName = 'zqq_recoil_m_mqq' # zqq_recoil_m_mqq zqq_recoil_m
             procs = ["ZH", "WW", "ZZ", "Zgamma", "Rare"] # first must be signal
             proc_idx = [0, p*1, p*2, p*3, p*4]
 
@@ -381,17 +395,30 @@ if __name__ == "__main__":
             
             # NOMINAL
             #inputDir = "output/h_zh_leptonic/histmaker/ecm240/mrec_100_150/"
-            
+            #inputDir = f"output/h_zh_leptonic/histmaker/ecm{ecm}/"
+            #hName, rebin = f'{cat}_zll_recoil', 50 # recoil 0.5 GeV bins
+
             # WITH COS THETA MISS
-            inputDir = "output/h_zh_leptonic/histmaker/ecm240/WithCosThetaMiss/"
-            hName, rebin = f'{cat}_zll_recoil', 50 # recoil 0.5 GeV bins
+            #inputDir = "output/h_zh_leptonic/histmaker/ecm240/WithCosThetaMiss/"
+            #hName, rebin = f'{cat}_zll_recoil', 50 # recoil 0.5 GeV bins
             
 
             # WITHOUT COS THETA MISS
             #inputDir = "output/h_zh_leptonic/histmaker/ecm240/mrec_100_150/"
             #hName, rebin = f'{cat}_zll_recoil', 50 # recoil 0.5 GeV bins
 
-            #hName, rebin = f'{cat}_mva_score', 1 # MVA score 100 bins
+            ## FIT MVA SCORE (100 bins)
+            inputDir = f"output/h_zh_leptonic/histmaker/ecm{ecm}/"
+            hName, rebin = f'{cat}_mva_score', 10 # MVA score 100 bins
+
+            # FIT RECOIL
+            #inputDir = f"output/h_zh_leptonic/histmaker/ecm{ecm}/"
+            #hName, rebin = f'{cat}_zll_recoil', 50 # recoil 0.5 GeV bins
+
+            ## NOMINAL
+            inputDir = f"output/h_zh_leptonic/histmaker/ecm{ecm}/"
+            hName, rebin = f'{cat}_recoil_m_mva', 1
+
             procs = ["ZH", "WW", "ZZ", "Zgamma", "Rare"] # first must be signal
             proc_idx = [0, p*1, p*2, p*3, p*4]
 

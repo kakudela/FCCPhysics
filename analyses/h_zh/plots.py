@@ -383,7 +383,7 @@ def makePlotHiggsDecays(hName, outName="", xMin=0, xMax=100, yMin=1, yMax=1e5, x
     if outName == "":
         outName = hName
 
-    sigs = [[f'wzp6_ee_{x}H_H{y}_ecm240' for x in z_decays] for y in h_decays]
+    sigs = [[f'wzp6_ee_{x}H_H{y}_ecm{ecm}' for x in z_decays] for y in h_decays]
     leg = ROOT.TLegend(.2, .925-(len(sigs)/4+1)*0.07, .95, .925)
     leg.SetBorderSize(0)
     leg.SetFillStyle(0)
@@ -465,7 +465,7 @@ def makePlotSignalRatios(hName, outName="", xMin=0, xMax=100, yMin=1, yMax=1e5, 
     if outName == "":
         outName = hName
 
-    sigs = [[f'wzp6_ee_{x}H_H{y}_ecm240' for x in z_decays] for y in h_decays]
+    sigs = [[f'wzp6_ee_{x}H_H{y}_ecm{ecm}' for x in z_decays] for y in h_decays]
     leg = ROOT.TLegend(.2, .925-(len(sigs)/4+1)*0.07, .95, .925)
     leg.SetBorderSize(0)
     leg.SetFillStyle(0)
@@ -740,6 +740,7 @@ if __name__ == "__main__":
     h_decays_no_mumu = ["bb", "cc", "gg", "ss", "tautau", "ZZ", "WW", "Za", "aa", "inv"]
     h_decays_rare_bsm = ["uu", "dd", "ee", "taue", "taumu", "bs", "bd", "cu", "sd"]
     h_decays_rare_bsm = ["uu", "dd", "ee", "taue", "taumu"]
+    
 
     h_decays_labels = {"bb": "H#rightarrowb#bar{b}", "cc": "H#rightarrowc#bar{c}", "ss": "H#rightarrows#bar{s}", "gg": "H#rightarrowgg", "mumu": "H#rightarrow#mu^{#plus}#mu^{#minus}", "tautau": "H#rightarrow#tau^{#plus}#tau^{#minus}", "ZZ": "H#rightarrowZZ*", "WW": "H#rightarrowWW*", "Za": "H#rightarrowZ#gamma", "aa": "H#rightarrow#gamma#gamma", "inv": "H#rightarrowInv"}
     h_decays_colors = {"bb": ROOT.kBlack, "cc": ROOT.kBlue , "ss": ROOT.kRed, "gg": ROOT.kGreen+1, "mumu": ROOT.kOrange, "tautau": ROOT.kCyan, "ZZ": ROOT.kGray, "WW": ROOT.kGray+2, "Za": ROOT.kGreen+2, "aa": ROOT.kRed+2, "inv": ROOT.kBlue+2}
@@ -764,8 +765,9 @@ if __name__ == "__main__":
     }
 
     procs_cfg_365 = {
-        "ZH"        : [f'wzp6_ee_{x}H_H{y}_ecm365' for x in z_decays for y in h_decays_no_mumu],
-        "ZqqH"      : [f'wzp6_ee_{x}H_H{y}_ecm365' for x in ["qq", "bb", "cc", "ss"] for y in h_decays_no_mumu],
+        "ZH"        : [f'wzp6_ee_{x}H_H{y}_ecm365' for x in z_decays for y in h_decays],
+        #"ZqqH"      : [f'wzp6_ee_{x}H_H{y}_ecm365' for x in ["qq", "bb", "cc", "ss"] for y in h_decays],
+        "ZqqH"      : [f'wzp6_ee_{x}H_H{y}_ecm365' for x in ["qq"] for y in ["bb"]],
         "ZmumuH"    : [f'wzp6_ee_mumuH_H{y}_ecm365' for y in h_decays],
         "ZeeH"      : [f'wzp6_ee_{x}H_H{y}_ecm365' for x in ["ee"] for y in h_decays],
         "WW"        : ['p8_ee_WW_ecm365', 'p8_ee_WW_mumu_ecm365', 'p8_ee_WW_ee_ecm365'], # p8_ee_WW_mumu_ecm365 p8_ee_WW_ecm365
@@ -813,15 +815,14 @@ if __name__ == "__main__":
 
     if cat == "qq":
 
-        inputDir = f"output/h_zh_hadronic/histmaker/ecm{ecm}/"
+        inputDir = f"output/h_zh_hadronic/histmaker/ecm{ecm}/FINAL"
         outDir = f"/home/submit/jaeyserm/public_html/fccee/h_zh_hadronic/plots_ecm{ecm}/"
 
         z_decays = ["qq", "bb", "cc", "ss"]
         procs = ["ZqqH", "WW", "ZZ", "Zgamma", "Rare"] # first must be signal
-        if ecm == 365: h_decays = h_decays_no_mumu
 
-        cuts = ["cut0", "cut1", "cut2", "cut3", "cut4", "cut5", "cut6", "cut7", "cut8", "cut9"]
-        cut_labels = ["All events", "Veto leptonic", "Clustering", "40 < m_{qq} < 140", "20 < p_{qq} < 90", "cos(qq) < 0.85", "acol > 0.35", "acop (none)", "WW pair mass", "|cos#theta_{miss}| < 0.995"]
+        cuts = ["cut0", "cut1", "cut2", "cut3", "cut4", "cut5", "cut6", "cut7", "cut8", "cut9", "cut10"]
+        cut_labels = ["All events", "Veto leptonic", "Clustering", "40 < m_{qq} < 140", "20 < p_{qq} < 90", "cos(qq) < 0.85", "acol > 0.35", "WW pair mass", "|cos#theta_{miss}| < 0.995", "Thrust"]
 
 
         makeCutFlowHiggsDecays("cutFlow", cuts=cuts, cut_labels=cut_labels, yMin=40, yMax=150, z_decays=z_decays, h_decays=h_decays, h_decays_labels=h_decays_labels, h_decays_colors=h_decays_colors)
@@ -830,7 +831,7 @@ if __name__ == "__main__":
 
 
         # significance
-        if True and ecm == 240:
+        if True:
             significance("zqq_m_best_nOne", 50, 130)
             significance("zqq_m_best_nOne", 50, 130, reverse=True)
 
@@ -849,7 +850,10 @@ if __name__ == "__main__":
             significance("delta_mWW_nOne", 0, 20)
             significance("cosThetaMiss_nOne", 0.95, 1, reverse=True)
 
-            significance("mva_score", 0, 0.9)
+            significance("thrust_magn", 0.8, 1, reverse=True)
+    
+
+            significance("mva_score", 0, 1)
             significance("mva_score", 0, 1, reverse=True)
 
         makePlotHiggsDecays("best_clustering_idx_nosel", xMin=-1, xMax=4, yMin=0, yMax=1.5, xLabels=["No pairs", "Inclusive", "Exclusive N=2", "Exclusive N=4", "Exclusive N=6"], yLabel="Events", logY=False)
@@ -934,7 +938,7 @@ if __name__ == "__main__":
 
     if cat == "ee" or cat == "mumu":
 
-        inputDir = f"output/h_zh_leptonic/histmaker/ecm{ecm}/WithCosThetaMiss/"
+        inputDir = f"output/h_zh_leptonic/histmaker/ecm{ecm}/"
         outDir = f"/home/submit/jaeyserm/public_html/fccee/h_zh_leptonic/plots_{cat}_ecm{ecm}/"
 
 
@@ -955,7 +959,7 @@ if __name__ == "__main__":
         #makeCutFlowHiggsDecays(f"{cat}_cutFlow", outName="cutFlow_rare_BSM", cuts=cuts, cut_labels=cut_labels, yMin=40, yMax=150, h_decays=h_decays_rare_bsm, h_decays_labels=h_decays_rare_bsm_labels, h_decays_colors=h_decays_rare_bsm_colors)
 
         # significance
-        if True and ecm == 240:
+        if True:
             significance(f"{cat}_cosThetaMiss_nOne", 0.95, 1, reverse=True)
             significance(f"{cat}_mva_score", 0, 0.99)
             significance(f"{cat}_mva_score", 0, 0.99, reverse=True)

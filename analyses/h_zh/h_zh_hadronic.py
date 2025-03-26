@@ -36,12 +36,9 @@ processListBkg = {
     f'wzp6_gaga_ee_60_ecm{ecm}':           {'fraction':fraction},
     f'wzp6_gaga_tautau_60_ecm{ecm}':       {'fraction':fraction},
     f'wzp6_ee_nuenueZ_ecm{ecm}':           {'fraction':fraction},
-
-
 }
 
-
-processListSig = {
+processListSignal = {
 
     f'wzp6_ee_qqH_Hbb_ecm{ecm}':           {'fraction':fraction},
     f'wzp6_ee_qqH_Hcc_ecm{ecm}':           {'fraction':fraction},
@@ -145,73 +142,94 @@ processListSig = {
 }
 
 
-fractionSig, fractionBkg = 0.5, 0.1
-processListTraining = {
+processListSignall = {
 
-    'wzp6_ee_qqH_Hbb_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_qqH_Hcc_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_qqH_Hss_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_qqH_Hgg_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_qqH_Haa_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_qqH_HZa_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_qqH_HWW_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_qqH_HZZ_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_qqH_Hmumu_ecm240':         {'fraction':fractionSig},
-    'wzp6_ee_qqH_Htautau_ecm240':       {'fraction':fractionSig},
-    'wz3p6_ee_qqH_Hinv_ecm240':         {'fraction':fractionSig},
+    f'wzp6_ee_qqH_Hss_ecm{ecm}':           {'fraction':fraction},
 
-    'wzp6_ee_ssH_Hbb_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ssH_Hcc_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ssH_Hss_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ssH_Hgg_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ssH_Haa_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ssH_HZa_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ssH_HWW_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ssH_HZZ_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ssH_Hmumu_ecm240':         {'fraction':fractionSig},
-    'wzp6_ee_ssH_Htautau_ecm240':       {'fraction':fractionSig},
-    'wz3p6_ee_ssH_Hinv_ecm240':         {'fraction':fractionSig},
-
-    'wzp6_ee_ccH_Hbb_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ccH_Hcc_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ccH_Hss_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ccH_Hgg_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ccH_Haa_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ccH_HZa_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ccH_HWW_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ccH_HZZ_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_ccH_Hmumu_ecm240':         {'fraction':fractionSig},
-    'wzp6_ee_ccH_Htautau_ecm240':       {'fraction':fractionSig},
-    'wz3p6_ee_ccH_Hinv_ecm240':         {'fraction':fractionSig},
-
-
-    'wzp6_ee_bbH_Hbb_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_bbH_Hcc_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_bbH_Hss_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_bbH_Hgg_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_bbH_Haa_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_bbH_HZa_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_bbH_HWW_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_bbH_HZZ_ecm240':           {'fraction':fractionSig},
-    'wzp6_ee_bbH_Hmumu_ecm240':         {'fraction':fractionSig},
-    'wzp6_ee_bbH_Htautau_ecm240':       {'fraction':fractionSig},
-    'wz3p6_ee_bbH_Hinv_ecm240':         {'fraction':fractionSig},
-
-    'p8_ee_WW_ecm240':                  {'fraction':fractionBkg},
-    'wz3p6_ee_uu_ecm240':               {'fraction':fractionBkg},
-    'wz3p6_ee_dd_ecm240':               {'fraction':fractionBkg},
-    'wz3p6_ee_cc_ecm240':               {'fraction':fractionBkg},
-    'wz3p6_ee_ss_ecm240':               {'fraction':fractionBkg},
-    'wz3p6_ee_bb_ecm240':               {'fraction':fractionBkg},
 }
 
-processList = processListSig | processListBkg
-processList = processListBkg
+fractionSig, fractionBkg = 0.5, 0.1
+if ecm == 365:
+    fractionSig, fractionBkg = 0.5, 1
+
+processListTraining = {
+    f'wzp6_ee_qqH_Hbb_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_qqH_Hcc_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_qqH_Hss_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_qqH_Hgg_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_qqH_Haa_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_qqH_HZa_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_qqH_HWW_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_qqH_HZZ_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_qqH_Hmumu_ecm{ecm}':         {'fraction':fractionSig},
+    f'wzp6_ee_qqH_Htautau_ecm{ecm}':       {'fraction':fractionSig},
+    f'wz3p6_ee_qqH_Hinv_ecm{ecm}':         {'fraction':fractionSig},
+
+    f'wzp6_ee_ssH_Hbb_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ssH_Hcc_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ssH_Hss_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ssH_Hgg_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ssH_Haa_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ssH_HZa_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ssH_HWW_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ssH_HZZ_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ssH_Hmumu_ecm{ecm}':         {'fraction':fractionSig},
+    f'wzp6_ee_ssH_Htautau_ecm{ecm}':       {'fraction':fractionSig},
+    f'wz3p6_ee_ssH_Hinv_ecm{ecm}':         {'fraction':fractionSig},
+
+    f'wzp6_ee_ccH_Hbb_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ccH_Hcc_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ccH_Hss_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ccH_Hgg_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ccH_Haa_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ccH_HZa_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ccH_HWW_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ccH_HZZ_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_ccH_Hmumu_ecm{ecm}':         {'fraction':fractionSig},
+    f'wzp6_ee_ccH_Htautau_ecm{ecm}':       {'fraction':fractionSig},
+    f'wz3p6_ee_ccH_Hinv_ecm{ecm}':         {'fraction':fractionSig},
+
+
+    f'wzp6_ee_bbH_Hbb_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_bbH_Hcc_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_bbH_Hss_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_bbH_Hgg_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_bbH_Haa_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_bbH_HZa_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_bbH_HWW_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_bbH_HZZ_ecm{ecm}':           {'fraction':fractionSig},
+    f'wzp6_ee_bbH_Hmumu_ecm{ecm}':         {'fraction':fractionSig},
+    f'wzp6_ee_bbH_Htautau_ecm{ecm}':       {'fraction':fractionSig},
+    f'wz3p6_ee_bbH_Hinv_ecm{ecm}':         {'fraction':fractionSig},
+    
+    f'p8_ee_WW_ecm{ecm}':                  {'fraction':fractionBkg},
+    f'wz3p6_ee_uu_ecm{ecm}':               {'fraction':fractionBkg},
+    f'wz3p6_ee_dd_ecm{ecm}':               {'fraction':fractionBkg},
+    f'wz3p6_ee_cc_ecm{ecm}':               {'fraction':fractionBkg},
+    f'wz3p6_ee_ss_ecm{ecm}':               {'fraction':fractionBkg},
+    f'wz3p6_ee_bb_ecm{ecm}':               {'fraction':fractionBkg},
+}
+
+processListTrainingLL = {
+
+    f'wz3p6_ee_uu_ecm{ecm}':               {'fraction':fractionBkg},
+    f'wz3p6_ee_dd_ecm{ecm}':               {'fraction':fractionBkg},
+    f'wz3p6_ee_cc_ecm{ecm}':               {'fraction':fractionBkg},
+}
+
+processList = processListSignal | processListBkg
+processList = processListSignal
 
 if treemaker:
     processList = processListTraining
 
 
+processList = {
+
+    f'p8_ee_WW_ecm{ecm}':                  {'fraction':fraction},
+
+
+}
 
 
 inputDir = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
@@ -223,9 +241,9 @@ includePaths = ["../../functions/functions.h", "../../functions/functions_gen.h"
 
 # output directory
 if treemaker:
-    outputDir   = f"/ceph/submit/data/group/fcc/ee/analyses/zh/hadronic/treemaker/ecm{ecm}/"
+    outputDir   = f"/ceph/submit/data/group/fcc/ee/analyses/zh/hadronic/treemaker/ecm{ecm}"
 else:
-    outputDir   = f"output/h_zh_hadronic/histmaker/ecm{ecm}/"
+    outputDir   = f"output/h_zh_hadronic/histmaker/ecm{ecm}"
 
 # optional: ncpus, default is 4, -1 uses all cores available
 nCPUS       = 32
@@ -234,12 +252,8 @@ nCPUS       = 32
 doScale = True
 intLumi = 10.8e6 if ecm == 240 else 3e6
 
-# define histograms
 
 # define histograms
-bins_p_mu = (2000, 0, 200) # 100 MeV bins
-bins_m_ll = (2000, 0, 200) # 100 MeV bins
-bins_p_ll = (200, 0, 200) # 1 GeV bins
 bins_recoil = (20000, 0, 200) # 10 MeV bins 
 bins_recoil_fine = (20000, 120, 140) # 1 MeV bins 
 bins_cosThetaMiss = (10000, 0, 1)
@@ -263,7 +277,7 @@ bins_cos_abs = (100, 0, 1)
 ROOT.EnableImplicitMT(nCPUS) # hack to deal correctly with TMVAHelperXGB  # bdt_model_new_0p1_WZqq bdt_model_new_0p1 bdt_model_0p1_inv bdt_model_0p1
 ## original: output/h_zh_hadronic/training/bdt_model_WW_Zg_thrust_reduced.root
 ## before: /ceph/submit/data/group/fcc/ee/analyses/zh/hadronic/training/bdt_model_final.root
-tmva_helper = TMVAHelperXGB("/ceph/submit/data/group/fcc/ee/analyses/zh/hadronic/training/bdt_model_ecm240.root", "bdt_model") # read the XGBoost training
+tmva_helper = TMVAHelperXGB(f"/ceph/submit/data/group/fcc/ee/analyses/zh/hadronic/training/bdt_model_ecm{ecm}.root", "bdt_model") # read the XGBoost training
 #tmva_helper = TMVAHelperXGB("output/h_zh_hadronic/training/bdt_model_WW_Zg_thrust_reduced_withInv.root", "bdt_model") # read the XGBoost training
 
 
@@ -341,8 +355,8 @@ def veto_selection_leptonic(df, flavor):
     sel_mll = f"zll_m_{flavor} > 86 && zll_m_{flavor} < 96"
     sel_pll = f"zll_p_{flavor} > 20 && zll_p_{flavor} < 70"
     #sel_recoil = f"zll_recoil_m_{flavor} < 133 && zll_recoil_m_{flavor} > 123" # tighter selection on recoil --> check impact in leptonic
-    sel_recoil = f"zll_recoil_m_{flavor} < 140 && zll_recoil_m_{flavor} > 120" # tighter selection on recoil --> check impact in leptonic
-
+    #sel_recoil = f"zll_recoil_m_{flavor} < 140 && zll_recoil_m_{flavor} > 120" # tighter selection on recoil --> check impact in leptonic
+    sel_recoil = f"zll_recoil_m_{flavor} < 150 && zll_recoil_m_{flavor} > 100" # tighter selection on recoil --> check impact in leptonic
     df = df.Filter(f"!({sel_leps} && {sel_mll} && {sel_pll} && {sel_recoil})")
     return df
 
@@ -354,7 +368,6 @@ def veto_selection_leptonic(df, flavor):
 def build_graph_zqq(df, dataset):
 
     hists = []
-    sigProcs = ["wzp6_ee_mumuH_ecm240", "wzp6_ee_eeH_ecm240"]
 
     df = df.Define("ecm", "240" if ecm == 240 else "365")
     df = df.Define("weight", "1.0")
@@ -409,27 +422,30 @@ def build_graph_zqq(df, dataset):
 
 
 
-
-
-
-    #df = df.Filter("ReconstructedParticles.size() > 30")
-    
     #### remove isolated photons from clustering
     df = df.Define("photons_all_p", "FCCAnalyses::ReconstructedParticle::get_p(photons_all)")
-    df = df.Define("photons", "FCCAnalyses::sel_range(40, 95, false)(photons_all, photons_all_p)")
+    if ecm == 240:
+        df = df.Define("photons", "FCCAnalyses::sel_range(40, 95, false)(photons_all, photons_all_p)")
+    else:
+        df = df.Define("photons", "FCCAnalyses::sel_range(20, 170, false)(photons_all, photons_all_p)")
     df = df.Define("rps_no_photons", "FCCAnalyses::ReconstructedParticle::remove(ReconstructedParticles, photons)")
 
 
     #### remove isolated muons from clustering
     # ensure orthogonality with leptonic channel
     df = df.Define("muons_all_p", "FCCAnalyses::ReconstructedParticle::get_p(muons_all)")
-    df = df.Define("muons", "FCCAnalyses::sel_range(40, 95, false)(muons_all, muons_all_p)")
+    if ecm == 240:
+        df = df.Define("muons", "FCCAnalyses::sel_range(40, 95, false)(muons_all, muons_all_p)")
+    else:
+        df = df.Define("muons", "FCCAnalyses::sel_range(20, 170, false)(muons_all, muons_all_p)")
 
     #### remove isolated electrons from clustering
     # ensure orthogonality with leptonic channel
     df = df.Define("electrons_all_p", "FCCAnalyses::ReconstructedParticle::get_p(electrons_all)")
-    df = df.Define("electrons", "FCCAnalyses::sel_range(40, 95, false)(electrons_all, electrons_all_p)")
-
+    if ecm == 240:
+        df = df.Define("electrons", "FCCAnalyses::sel_range(40, 95, false)(electrons_all, electrons_all_p)")
+    else:
+        df = df.Define("electrons", "FCCAnalyses::sel_range(20, 170, false)(electrons_all, electrons_all_p)")
 
     ### remove isolated electrons from clustering
     # ensure orthogonality with leptonic channel
@@ -438,8 +454,11 @@ def build_graph_zqq(df, dataset):
 
 
     # define PF candidates collection by removing the muons
-    #df = df.Alias("rps_sel", "rps_no_photons_muons_electrons")
-    df = df.Alias("rps_sel", "ReconstructedParticles")
+    if ecm == 240:
+        #df = df.Alias("rps_sel", "ReconstructedParticles") ## this was enabled for 240 GeV ### TO BE CHECKED
+        df = df.Alias("rps_sel", "rps_no_photons_muons_electrons")
+    else:
+        df = df.Alias("rps_sel", "rps_no_photons_muons_electrons")
     df = df.Define("RP_px", "FCCAnalyses::ReconstructedParticle::get_px(rps_sel)")
     df = df.Define("RP_py", "FCCAnalyses::ReconstructedParticle::get_py(rps_sel)")
     df = df.Define("RP_pz","FCCAnalyses::ReconstructedParticle::get_pz(rps_sel)")
@@ -469,7 +488,7 @@ def build_graph_zqq(df, dataset):
     df = df.Define("zqq_recoil_m", "Vec_f r = {zqq_recoil_m_N0, zqq_recoil_m_N2, zqq_recoil_m_N4, zqq_recoil_m_N6}; return r;")
     df = df.Define("njets", "Vec_i r = {(int)njets_cand_N0, (int)njets_cand_N2, (int)njets_cand_N4, (int)njets_cand_N6}; return r;")
     df = df.Define("njets_target", "Vec_i r = {0, 2, 4, 6}; return r;")
-    df = df.Define("best_clustering_idx", "FCCAnalyses::best_clustering_idx(zqq_m, zqq_p, zqq_recoil_m, njets, njets_target)")
+    df = df.Define("best_clustering_idx", "FCCAnalyses::best_clustering_idx(zqq_m, zqq_p, zqq_recoil_m, njets, njets_target, ecm)")
 
     hists.append(df.Histo1D(("best_clustering_idx_nosel", "", *(15, -5, 10)), "best_clustering_idx"))
 
@@ -498,9 +517,9 @@ def build_graph_zqq(df, dataset):
     hists.append(df.Histo1D(("z_costheta_nosel", "", *bins_cos_abs), "z_costheta"))
     
 
-    hists.append(df.Histo1D(("zqq_m_best_nosel", "", *(200, 0, 200)), "zqq_m_best"))
-    hists.append(df.Histo1D(("zqq_p_best_nosel", "", *(200, 0, 200)), "zqq_p_best"))
-    hists.append(df.Histo1D(("zqq_recoil_m_best_nosel", "", *(200, 0, 200)), "zqq_recoil_m_best"))
+    hists.append(df.Histo1D(("zqq_m_best_nosel", "", *(400, 0, 400)), "zqq_m_best"))
+    hists.append(df.Histo1D(("zqq_p_best_nosel", "", *(400, 0, 400)), "zqq_p_best"))
+    hists.append(df.Histo1D(("zqq_recoil_m_best_nosel", "", *(400, 0, 400)), "zqq_recoil_m_best"))
     hists.append(df.Histo2D(("zqq_recoil_m_mqq_nosel", "", *((25, 100, 150)+(35, 50, 120))), "zqq_recoil_m_best", "zqq_m_best"))
 
     ## jet kinematics
@@ -511,8 +530,8 @@ def build_graph_zqq(df, dataset):
     df = df.Define("leading_jet_costheta", "zqq_jets_costheta_best[leading_idx]")
     df = df.Define("subleading_jet_costheta", "zqq_jets_costheta_best[subleading_idx]")
     
-    hists.append(df.Histo1D(("leading_jet_p", "", *(200, 0, 200)), "leading_jet_p"))
-    hists.append(df.Histo1D(("subleading_jet_p", "", *(200, 0, 200)), "subleading_jet_p"))
+    hists.append(df.Histo1D(("leading_jet_p", "", *(400, 0, 400)), "leading_jet_p"))
+    hists.append(df.Histo1D(("subleading_jet_p", "", *(400, 0, 400)), "subleading_jet_p"))
     hists.append(df.Histo1D(("leading_jet_costheta", "", *bins_cos_abs), "leading_jet_costheta"))
     hists.append(df.Histo1D(("subleading_jet_costheta", "", *bins_cos_abs), "subleading_jet_costheta"))
 
@@ -530,10 +549,10 @@ def build_graph_zqq(df, dataset):
     df = df.Define("delta_mWW", "std::sqrt((W1_m-78)*(W1_m-78) + (W2_m-78)*(W2_m-78))")
 
     hists.append(df.Histo1D(("delta_mWW_nosel", "", *(1000, 0, 100)), "delta_mWW"))
-    hists.append(df.Histo1D(("W1_m_nosel", "", *(200, 0, 200)), "W1_m"))
-    hists.append(df.Histo1D(("W2_m_nosel", "", *(200, 0, 200)), "W2_m"))
-    hists.append(df.Histo1D(("W1_p_nosel", "", *(200, 0, 200)), "W1_p"))
-    hists.append(df.Histo1D(("W2_p_nosel", "", *(200, 0, 200)), "W2_p"))
+    hists.append(df.Histo1D(("W1_m_nosel", "", *(400, 0, 400)), "W1_m"))
+    hists.append(df.Histo1D(("W2_m_nosel", "", *(400, 0, 400)), "W2_m"))
+    hists.append(df.Histo1D(("W1_p_nosel", "", *(400, 0, 400)), "W1_p"))
+    hists.append(df.Histo1D(("W2_p_nosel", "", *(400, 0, 400)), "W2_p"))
     hists.append(df.Histo1D(("W1_costheta_nosel", "", *bins_cos_abs), "W1_costheta"))
     hists.append(df.Histo1D(("W2_costheta_nosel", "", *bins_cos_abs), "W2_costheta"))
     ##
@@ -549,10 +568,10 @@ def build_graph_zqq(df, dataset):
     df = df.Define("delta_mWW_prime", "std::sqrt((W1_m_prime-78)*(W1_m_prime-78) + (W2_m_prime-78)*(W2_m_prime-78))")
 
     hists.append(df.Histo1D(("delta_mWW_nosel_prime", "", *(1000, 0, 100)), "delta_mWW_prime"))
-    hists.append(df.Histo1D(("W1_m_nosel_prime", "", *(200, 0, 200)), "W1_m_prime"))
-    hists.append(df.Histo1D(("W2_m_nosel_prime", "", *(200, 0, 200)), "W2_m_prime"))
-    hists.append(df.Histo1D(("W1_p_nosel_prime", "", *(200, 0, 200)), "W1_p_prime"))
-    hists.append(df.Histo1D(("W2_p_nosel_prime", "", *(200, 0, 200)), "W2_p_prime"))
+    hists.append(df.Histo1D(("W1_m_nosel_prime", "", *(400, 0, 400)), "W1_m_prime"))
+    hists.append(df.Histo1D(("W2_m_nosel_prime", "", *(400, 0, 400)), "W2_m_prime"))
+    hists.append(df.Histo1D(("W1_p_nosel_prime", "", *(400, 0, 400)), "W1_p_prime"))
+    hists.append(df.Histo1D(("W2_p_nosel_prime", "", *(400, 0, 400)), "W2_p_prime"))
     '''
     ##############################################################
     ## START SELECTION
@@ -562,19 +581,25 @@ def build_graph_zqq(df, dataset):
 
     ## CUT ON m(qq)
     
-    hists.append(df.Histo1D(("zqq_m_best_nOne", "", *(200, 0, 200)), "zqq_m_best"))
+    hists.append(df.Histo1D(("zqq_m_best_nOne", "", *(400, 0, 400)), "zqq_m_best"))
     ##df = df.Filter("zqq_m_best > 60 && zqq_m_best < 110") # tighter at 80, but aa/mumu problem
-    df = df.Filter("zqq_m_best > 20 && zqq_m_best < 140") ## loose
+    if ecm == 240:
+        df = df.Filter("zqq_m_best > 20 && zqq_m_best < 140") ## loose
+    else:
+        df = df.Filter("zqq_m_best > 20 && zqq_m_best < 200") ## loose
     #df = df.Filter("zqq_m_best > 40 && zqq_m_best < 140") ## loose
     #df = df.Filter("zqq_m_best > 80 && zqq_m_best < 110") ## aggressive 80-60 seems not too much of a difference --> because we fit it!
     hists.append(df.Histo1D(("cutFlow", "", *bins_count), "cut3"))
 
 
     ## CUT ON p(qq)
-    hists.append(df.Histo1D(("zqq_p_best_nOne", "", *(200, 0, 200)), "zqq_p_best"))
+    hists.append(df.Histo1D(("zqq_p_best_nOne", "", *(400, 0, 400)), "zqq_p_best"))
     ##df = df.Filter("zqq_p_best < 60 && zqq_p_best > 30")
     #df = df.Filter("zqq_p_best < 60") # see significance
-    df = df.Filter("zqq_p_best < 90 && zqq_p_best > 20")
+    if ecm == 240:
+        df = df.Filter("zqq_p_best < 90 && zqq_p_best > 20")
+    else:
+        df = df.Filter("zqq_p_best < 160 && zqq_p_best > 60")
     hists.append(df.Histo1D(("cutFlow", "", *bins_count), "cut4"))
 
 
@@ -595,24 +620,24 @@ def build_graph_zqq(df, dataset):
     ## acoplanarity
     df = df.Define("acoplanarity", "FCCAnalyses::acoplanarity(zqq_jets_best)")
     hists.append(df.Histo1D(("acoplanarity_nOne", "", *bins_aco), "acoplanarity"))
-    df = df.Filter("acoplanarity < 5")
-    hists.append(df.Histo1D(("cutFlow", "", *bins_count), "cut7"))
+    #df = df.Filter("acoplanarity < 5") ## NO CUT
+    #hists.append(df.Histo1D(("cutFlow", "", *bins_count), "cut7"))
 
 
 
 
     hists.append(df.Histo2D(("W1_m_W2_m_nOne", "", *((150, 0, 150)+(150, 0, 150))), "W1_m", "W2_m"))
     hists.append(df.Histo1D(("delta_mWW_nOne", "", *(1000, 0, 100)), "delta_mWW"))
-    hists.append(df.Histo1D(("W1_m_nOne", "", *(200, 0, 200)), "W1_m"))
-    hists.append(df.Histo1D(("W2_m_nOne", "", *(200, 0, 200)), "W2_m"))
+    hists.append(df.Histo1D(("W1_m_nOne", "", *(400, 0, 400)), "W1_m"))
+    hists.append(df.Histo1D(("W2_m_nOne", "", *(400, 0, 400)), "W2_m"))
 
 
     df =df.Filter("delta_mWW > 6")
-    hists.append(df.Histo1D(("cutFlow", "", *bins_count), "cut8"))
+    hists.append(df.Histo1D(("cutFlow", "", *bins_count), "cut7"))
 
 
-    hists.append(df.Histo1D(("W1_p_nOne", "", *(200, 0, 200)), "W1_p"))
-    hists.append(df.Histo1D(("W2_p_nOne", "", *(200, 0, 200)), "W2_p"))
+    hists.append(df.Histo1D(("W1_p_nOne", "", *(400, 0, 400)), "W1_p"))
+    hists.append(df.Histo1D(("W2_p_nOne", "", *(400, 0, 400)), "W2_p"))
 
 
     ####
@@ -624,7 +649,7 @@ def build_graph_zqq(df, dataset):
     hists.append(df.Histo1D(("cosThetaMiss_nOne", "", *bins_cosThetaMiss), "cosThetaMiss"))
     
     df = df.Filter("cosThetaMiss < .995")
-    hists.append(df.Histo1D(("cutFlow", "", *bins_count), "cut9"))
+    hists.append(df.Histo1D(("cutFlow", "", *bins_count), "cut8"))
 
     ## thrust
     df = df.Define("rps_charged_idx", "RP_q != 0") # select only charged particles
@@ -649,21 +674,31 @@ def build_graph_zqq(df, dataset):
     hists.append(df.Histo1D(("thrust_magn", "", *(1000, 0, 1)), "thrust_magn"))
     hists.append(df.Histo1D(("thrust_costheta", "", *bins_cos_abs), "thrust_costheta"))
 
+    if ecm == 365:
+        df = df.Filter("thrust_magn < 0.85")
+        hists.append(df.Histo1D(("cutFlow", "", *bins_count), "cut9"))
+
     df = tmva_helper.run_inference(df, col_name="mva_score")
     hists.append(df.Histo1D(("mva_score", "", *(1000, 0, 1)), "mva_score"))
 
     #df = df.Filter("mva_score[0] > 0.4")
     ## final histograms
-    hists.append(df.Histo1D(("zqq_recoil_m", "", *(200, 0, 200)), "zqq_recoil_m_best"))
-    hists.append(df.Histo1D(("zqq_m", "", *(200, 0, 200)), "zqq_m_best"))
+    hists.append(df.Histo1D(("zqq_recoil_m", "", *(400, 0, 400)), "zqq_recoil_m_best"))
+    hists.append(df.Histo1D(("zqq_m", "", *(400, 0, 400)), "zqq_m_best"))
     #hists.append(df.Histo2D(("zqq_recoil_m_mqq", "", *((50, 100, 150)+(60, 60, 120))), "zqq_recoil_m_best", "zqq_m_best"))
     hists.append(df.Histo3D(("zqq_recoil_m_mqq_pqq", "", *((50, 100, 150)+(100, 40, 140)+(40, 20, 60))), "zqq_recoil_m_best", "zqq_m_best", "zqq_p_best"))
     hists.append(df.Histo2D(("zqq_recoil_m_mqq", "", *((50, 100, 150)+(100, 40, 140))), "zqq_recoil_m_best", "zqq_m_best"))
     hists.append(df.Histo2D(("zqq_recoil_m_pqq", "", *((50, 100, 150)+(40, 20, 60))), "zqq_recoil_m_best", "zqq_p_best"))
 
     bins_mva_ = [0, 0.33, 0.66, 1]
-    bins_mva_ = [0, 0.75, 1] # 0.75 = max significance
-    bins_mrec_ = list(range(100, 151, 1))
+    
+    if ecm == 240:
+        bins_mrec_ = list(range(100, 151, 1))
+        bins_mva_ = [0, 0.75, 1] # 0.75 = max significance
+        bins_mva_ = [0, 0.70, 1] # 0.75 = max significance
+    else:
+        bins_mrec_ = list(range(100, 201, 1))
+        bins_mva_ = [0, 0.95, 1] # 0.75 = max significance
     bins_m_ = list(range(40, 141, 1)) 
     bins_mva = array.array('d', bins_mva_)
     bins_mrec = array.array('d', bins_mrec_)
@@ -674,7 +709,6 @@ def build_graph_zqq(df, dataset):
     hists.append(df.Histo2D(("zqq_recoil_m_mva", "", *((50, 100, 150)+(2, 0, 1))), "zqq_recoil_m_best", "mva_score"))
     #hists.append(df.Histo3D(("zqq_recoil_m_mqq_mva", "", *((50, 100, 150)+(100, 40, 140)+(2, 0, 1))), "zqq_recoil_m_best", "zqq_m_best", "mva_score"))
     return hists, weightsum, df
-
 
 
 if treemaker:

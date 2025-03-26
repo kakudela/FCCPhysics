@@ -2,9 +2,15 @@
 
 namespace FCCAnalyses {
 
-float frac_mz = 1.0;
-float frac_pz = 1.0;
-float frac_rec = 1.0;
+float frac_mz_240 = 1.0;
+float frac_pz_240 = 1.0;
+float frac_rec_240 = 1.0;
+float pz_240 = 52;
+
+float frac_mz_365 = 5.0;
+float frac_pz_365 = 1.0;
+float frac_rec_365 = 1.0;
+float pz_365 = 143;
 
 
 Vec_tlv pair_WW_N4(Vec_rp in) {
@@ -237,7 +243,24 @@ Vec_rp expand_jets(Vec_rp in, int njets) {
     return in;
 }
 
-int best_clustering_idx(Vec_f mz, Vec_f pz, Vec_f mrec, Vec_i njets, Vec_i njets_target) {
+int best_clustering_idx(Vec_f mz, Vec_f pz, Vec_f mrec, Vec_i njets, Vec_i njets_target, int ecm=240) {
+
+    float frac_mz = 1.0;
+    float frac_pz = 1.0;
+    float frac_rec = 1.0;
+    float pz_ = 52;
+    if(ecm == 240) {
+        frac_mz = frac_mz_240;
+        frac_pz = frac_pz_240;
+        frac_rec = frac_rec_240;
+        pz_ = pz_240;
+    }
+    if(ecm == 365) {
+        frac_mz = frac_mz_365;
+        frac_pz = frac_pz_365;
+        frac_rec = frac_rec_365;
+        pz_ = pz_365;
+    }
 
     float mz_ = 91.2;
     float mh_ = 125.0;
@@ -245,7 +268,7 @@ int best_clustering_idx(Vec_f mz, Vec_f pz, Vec_f mrec, Vec_i njets, Vec_i njets
     Vec_f chi2;
     for(int i = 0; i < mz.size(); i++) {
 
-        float c = frac_mz*std::pow(mz[i] - mz_, 2) + frac_rec*std::pow(mrec[i] - mh_, 2) + frac_pz*std::pow(pz[i] - 52, 2);
+        float c = frac_mz*std::pow(mz[i] - mz_, 2) + frac_rec*std::pow(mrec[i] - mh_, 2) + frac_pz*std::pow(pz[i] - pz_, 2);
         if(i==0 && njets[0] < 2) c = 9e99;
         else if(i > 0 && njets[i] != njets_target[i]) c = 9e99;
         chi2.push_back(c);
@@ -299,11 +322,29 @@ struct resonanceBuilder_mass_recoil_hadronic {
 resonanceBuilder_mass_recoil_hadronic::resonanceBuilder_mass_recoil_hadronic(float arg_resonance_mass, float arg_recoil_mass, float arg_chi2_recoil_frac, float arg_ecm) {m_resonance_mass = arg_resonance_mass, m_recoil_mass = arg_recoil_mass, chi2_recoil_frac = arg_chi2_recoil_frac, ecm = arg_ecm;}
 
 Vec_rp resonanceBuilder_mass_recoil_hadronic::resonanceBuilder_mass_recoil_hadronic::operator()(Vec_rp legs) {
+    float frac_mz = 1.0;
+    float frac_pz = 1.0;
+    float frac_rec = 1.0;
+    float pz_ = 52;
+    if(ecm == 240) {
+        frac_mz = frac_mz_240;
+        frac_pz = frac_pz_240;
+        frac_rec = frac_rec_240;
+        pz_ = pz_240;
+    }
+    if(ecm == 365) {
+        frac_mz = frac_mz_365;
+        frac_pz = frac_pz_365;
+        frac_rec = frac_rec_365;
+        pz_ = pz_365;
+    }
+
+
     Vec_rp result;
     result.reserve(3);
     std::vector<std::vector<int>> pairs; // for each permutation, add the indices of the muons
     int n = legs.size();
-
+    //cout << "******************* " << n << endl;
     if(n > 1) {
         ROOT::VecOps::RVec<bool> v(n);
         std::fill(v.end() - 2, v.end(), true); // helper variable for permutations
@@ -346,7 +387,7 @@ Vec_rp resonanceBuilder_mass_recoil_hadronic::resonanceBuilder_mass_recoil_hadro
     }
 
     if(result.size() > 1) {
-
+        //cout << "*******************" << endl;
         Vec_rp bestReso;
         int idx_min = -1;
         float d_min = 9e9;
@@ -370,17 +411,21 @@ Vec_rp resonanceBuilder_mass_recoil_hadronic::resonanceBuilder_mass_recoil_hadro
             float momentum = tg.P();
             float mass = frac_mz*std::pow(result.at(i).mass - m_resonance_mass, 2); // mass
             float rec = frac_rec*std::pow(recoil_fcc.mass - m_recoil_mass, 2); // recoil
-            float p = frac_pz*std::pow(momentum - 52, 2); // recoil
+            float p = frac_pz*std::pow(momentum - pz_, 2); // recoil
             //float d = (1.0-chi2_recoil_frac)*mass + chi2_recoil_frac*rec;
             float d = mass + rec + p;
             if(d < d_min) {
                 d_min = d;
                 idx_min = i;
             }
-
+            //cout << ecm << " " << pz_ << " masss=" << result.at(i).mass << " recoil_mass=" << recoil_fcc.mass << " momentum=" << momentum << endl;
+            //if(result.at(i).mass < 127 && result.at(i).mass > 123) {
+            //    cout << "!!!!! PREVIOUS" << endl;
+            //}
         }
         if(idx_min > -1) { 
             bestReso.push_back(result.at(idx_min));
+            //cout << "SELECTED " << result.at(idx_min).mass << endl;
             auto & l1 = legs[pairs[idx_min][0]];
             auto & l2 = legs[pairs[idx_min][1]];
             bestReso.emplace_back(l1);

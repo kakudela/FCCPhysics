@@ -7,9 +7,8 @@ ROOT.gStyle.SetOptStat(0)
 ROOT.gStyle.SetOptTitle(0)
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--cat", type=str, help="Category (mumu, ee, nunu, qq)", default="mumu")
+parser.add_argument("--ecm", type=int, help="Center-of-mass energy", default=240)
 parser.add_argument("--run", help="Run combine", action='store_true')
-parser.add_argument("--plot", help="Plot", action='store_true')
 args = parser.parse_args()
 
 def getHistQQ(hName, procs, rebin=1):
@@ -26,6 +25,38 @@ def getHistQQ(hName, procs, rebin=1):
     hist.Rebin(rebin)
     return hist
 
+def removeNegativeBins(hist):
+    totNeg, tot = 0., 0.
+    if "TH1" in hist.ClassName():
+        nbinsX = hist.GetNbinsX()
+        for x in range(1, nbinsX + 1):
+            content = hist.GetBinContent(x)
+            tot += content
+            if content < 0:
+                totNeg += content
+                hist.SetBinContent(x, 0)
+                hist.SetBinError(x, 0)
+    elif "TH2" in hist.ClassName():
+        pass
+
+    elif "TH3" in hist.ClassName():
+        nbinsX = hist.GetNbinsX()
+        nbinsY = hist.GetNbinsY()
+        nbinsZ = hist.GetNbinsZ()
+        for x in range(1, nbinsX + 1):
+            for y in range(1, nbinsY + 1):
+                for z in range(1, nbinsZ + 1):
+                    content = hist.GetBinContent(x, y, z)
+                    error = hist.GetBinError(x, y, z)  # Retrieve bin error
+                    tot += content
+                    if content < 0:
+                        #print("WARNING: NEGATIVE BIN CONTENT", content, hist.GetName())
+                        totNeg += content
+                        hist.SetBinContent(x, y, z, 0)
+                        hist.SetBinError(x, y, z, 0)
+    if totNeg != 0:
+        print(f"WARNING: TOTAL {tot}, NEGATIVE {totNeg}, FRACTION {totNeg/tot}")
+    return hist
 
 
 def getHist(hName, procs, rebin=1, isVBF=False):
@@ -50,7 +81,6 @@ def getHist(hName, procs, rebin=1, isVBF=False):
             hist.Add(h)
         
     hist.Rebin(rebin)
-    #hist.Scale(3./10.8 * 1.05/1.39)
     return hist
 
 def smooth_histogram_gaussian_kernel(hist, sigma, fOut):
@@ -156,6 +186,7 @@ def unroll(hist, rebin=1):
                 h1.SetBinContent(bin_1d, content)
                 h1.SetBinError(bin_1d, error)
                 #print(hist.GetXaxis().GetBinCenter(bin_x), hist.GetYaxis().GetBinCenter(bin_y), content, error)
+        h1 = removeNegativeBins(h1)
         return h1
 
 
@@ -194,164 +225,155 @@ def unroll(hist, rebin=1):
 
 if __name__ == "__main__":
 
-    ecm = 365
-    cat = "vbf"
+    ecm = args.ecm
 
-    inputDir = f"output/h_za/histmaker/ecm{ecm}_{cat}//"
     outDir = "output/h_za/combine/"
     plot_dir = "/home/submit/jaeyserm/public_html/fccee/h_za/combine_smoothing/"
-    rebin = 1 # 100 MVA bins
-    sigma = 1
 
     if ecm == 240:
-        sigs = ['wzp6_ee_nunuH_HZa_ecm240', 'wzp6_ee_eeH_HZa_ecm240', 'wzp6_ee_tautauH_HZa_ecm240', 'wzp6_ee_ccH_HZa_ecm240', 'wzp6_ee_bbH_HZa_ecm240', 'wzp6_ee_qqH_HZa_ecm240', 'wzp6_ee_ssH_HZa_ecm240', 'wzp6_ee_mumuH_HZa_ecm240']
+        sigs_zh = ['wzp6_ee_nunuH_HZa_ecm240', 'wzp6_ee_eeH_HZa_ecm240', 'wzp6_ee_tautauH_HZa_ecm240', 'wzp6_ee_ccH_HZa_ecm240', 'wzp6_ee_bbH_HZa_ecm240', 'wzp6_ee_qqH_HZa_ecm240', 'wzp6_ee_ssH_HZa_ecm240', 'wzp6_ee_mumuH_HZa_ecm240']
         bkgs = ['wz3p6_ee_gammagamma_ecm240', 'wz3p6_ee_uu_ecm240', 'wz3p6_ee_dd_ecm240', 'wz3p6_ee_cc_ecm240', 'wz3p6_ee_ss_ecm240', 'wz3p6_ee_bb_ecm240', 'wz3p6_ee_tautau_ecm240', 'wz3p6_ee_mumu_ecm240', 'wz3p6_ee_nunu_ecm240', 'wz3p6_ee_ee_Mee_30_150_ecm240', 'p8_ee_ZZ_ecm240']
 
     if ecm == 365:
-        sigs = ['wzp6_ee_nunuH_HZa_ecm240', 'wzp6_ee_eeH_HZa_ecm240', 'wzp6_ee_tautauH_HZa_ecm240', 'wzp6_ee_ccH_HZa_ecm240', 'wzp6_ee_bbH_HZa_ecm240', 'wzp6_ee_qqH_HZa_ecm240', 'wzp6_ee_ssH_HZa_ecm240', 'wzp6_ee_mumuH_HZa_ecm240']
-        sigs = ['wzp6_ee_nuenueVBFH_HZa_ecm365']
+        sigs_zh = ['wzp6_ee_numunumuH_HZa_ecm365', 'wzp6_ee_eeH_HZa_ecm365', 'wzp6_ee_tautauH_HZa_ecm365', 'wzp6_ee_ccH_HZa_ecm365', 'wzp6_ee_bbH_HZa_ecm365', 'wzp6_ee_qqH_HZa_ecm365', 'wzp6_ee_ssH_HZa_ecm365', 'wzp6_ee_mumuH_HZa_ecm365']
+        sigs_vbf = ['wzp6_ee_nuenueVBFH_HZa_ecm365']
         bkgs = ['wz3p6_ee_gammagamma_ecm365', 'wz3p6_ee_uu_ecm365', 'wz3p6_ee_dd_ecm365', 'wz3p6_ee_cc_ecm365', 'wz3p6_ee_ss_ecm365', 'wz3p6_ee_bb_ecm365', 'wz3p6_ee_tautau_ecm365', 'wz3p6_ee_mumu_ecm365', 'wz3p6_ee_nunu_ecm365', 'wz3p6_ee_ee_Mee_30_150_ecm365', 'p8_ee_ZZ_ecm365']
 
-    #bkgs = ['p8_ee_ZZ_ecm240']
-
-    hists = ["hqqa_final_1D_mva", "hvva_final_1D_mva"] # 28.976/34.240/23.235
-    hists = ["hqqa_final_chi2", "hvva_final_chi2"] # 28.733/34.454/23.147
-    hists = ['qqvv_H_m'] # chi2 pairing
-    ## seems no difference between chi2 and MVA?
-    hists = ["hvva_mva_score", "hqqa_mva_score"] 
-    #hists = ["hqqa_final_2D_mva", "hvva_final_2D_mva"]
-    
-    #hists = ["hqqa_final_chi2", "hvva_final_chi2"] # 23%
-    #hists = ["hqqa_final_1D_mva", "hvva_final_1D_mva"] # 23.2 %
-    #hists = ["qqvv_mva_score"]
-
-    # qqqq tests
-    #hists = ["qqqq_H_m_final"] # 55.331
-    #hists = ["qqqq_H_m_hz1", "qqqq_H_m_hz2"] # 69.121/73.117/55.855
-    
-    
-    #hists = ["hqqa_mass_difference_qqa_vv", "hvva_mass_difference_vva_qq"] # 38.942/43.131/32.034
-    #hists = ["qqqq_mass_difference_Z1a_Z2", "qqqq_mass_difference_Z2a_Z1"] # 67.684/69.297/56.533
-    
-    # pairing_chi2
-    hists = ["qqvv_H_m"] # 23.242
-    hists = ["qqvv_mass_difference_H_Z"] # 34.509
-    hists = ["qqvv_mva_score_split_chi2"] # 12.134 /// 11.481 (full ZZ stats) --> factor of 2 with MVA
-    
-    #hists = ["qqvv_hqqa_mva_score", "qqvv_hvva_mva_score"]
-
-    # splitting_chi2
-    #hists = ["qqvv_hqqa_final_chi2", "qqvv_hvva_final_chi2"] # 27.225/34.781/22.598
-    hists = ["qqvv_qqa_m_vva_m"]
-
-    # splitting_mva
-    #hists = ["qqvv_hqqa_final_1D_mva", "qqvv_hvva_final_1D_mva"] # 27.254/34.996/22.720
-    
-    if ecm == 365 and cat == "vbf":
-        hists = ['qqa_m']
-
-    for hName in hists:
-        h_sig = getHist(hName, sigs, rebin=rebin)
-        h_bkg = getHist(hName, bkgs, rebin=rebin)
-
-        #h_sig = unroll(h_sig)
-        #h_bkg = unroll(h_bkg)
-        #h_sig = smooth_histogram_gaussian_kernel(h_sig, sigma, f"{hName}_sig")
-        #h_bkg = smooth_histogram_gaussian_kernel(h_bkg, sigma, f"{hName}_bkg")
-
-        h_sig.SetName(f"{hName}_sig")
-        h_bkg.SetName(f"{hName}_bkg")
-
-        fOut = ROOT.TFile(f"{outDir}/datacard_{hName}.root", "RECREATE")
-        h_sig.Write()
-        h_bkg.Write()
-        h_data = h_sig.Clone(f"{hName}_data")
-        h_data.Add(h_bkg)
-
-        sign = h_sig.Integral() / (h_data.Integral())**0.5
-        print(f"SIG: {h_sig.Integral()}")
-        print(f"DATA: {h_data.Integral()}")
-        print(f"SIGNIFICANCE: {sign}")
-
-        h_data.Write()
-        fOut.Close()
-        
-        
 
 
-        dc = ""
-        dc += "imax *\n"
-        dc += "jmax *\n"
-        dc += "kmax *\n"
-        dc += "####################\n"
-        dc += f"shapes *        * datacard_{hName}.root $CHANNEL_$PROCESS\n"
-        dc += f"shapes data_obs * datacard_{hName}.root $CHANNEL_data\n"
-        dc += "####################\n"
-        dc += f"bin          {hName}\n"
-        dc += "observation  -1\n"
-        dc += "####################\n"
-        dc += f"bin          {hName}       {hName}\n"
-        dc += "process      sig         bkg\n"
-        dc += "process      0           1\n"
-        dc += "rate         -1          -1\n"
-        dc += "####################\n"
-        #dc += "dummy lnN    -     1.00001\n"
-        dc += "bkg lnN      -           1.01\n"
-        #dc += "* autoMCStats 0 0 1\n"
+    cats = ['qqvv']
+    if ecm == 365:
+        cats.append('vbf')
+    for cat in cats:
+        print("**************************", cat)
+        if ecm == 240:
+            sigs = sigs_zh
+            inputDir = f"output/h_za/histmaker/ecm{ecm}_qqvv/"
+            hName, rebin = 'mva_score', 10
+
+            h_sig = getHist(hName, sigs, rebin=rebin)
+            h_bkg = getHist(hName, bkgs, rebin=rebin)
+
+            #h_sig = smooth_histogram_gaussian_kernel(h_sig, sigma, f"{cat}_sig")
+            #h_bkg = smooth_histogram_gaussian_kernel(h_bkg, sigma, f"{cat}_bkg")
+
+            h_sig.SetName(f"{cat}_sig_zh")
+            h_bkg.SetName(f"{cat}_bkg")
+
+            fOut = ROOT.TFile(f"{outDir}/datacard_{cat}.root", "RECREATE")
+            h_sig.Write()
+            h_bkg.Write()
+            h_data = h_sig.Clone(f"{cat}_data")
+            h_data.Add(h_bkg)
+
+            sign = h_sig.Integral() / (h_data.Integral())**0.5
+            print(f"SIG: {h_sig.Integral()}")
+            print(f"DATA: {h_data.Integral()}")
+            print(f"SIGNIFICANCE: {sign}")
+
+            h_data.Write()
+            fOut.Close()
+
+            dc = ""
+            dc += "imax *\n"
+            dc += "jmax *\n"
+            dc += "kmax *\n"
+            dc += "####################\n"
+            dc += f"shapes *        * datacard_{cat}.root $CHANNEL_$PROCESS\n"
+            dc += f"shapes data_obs * datacard_{cat}.root $CHANNEL_data\n"
+            dc += "####################\n"
+            dc += f"bin          {cat}\n"
+            dc += "observation  -1\n"
+            dc += "####################\n"
+            dc += f"bin          {cat}       {cat}\n"
+            dc += "process      sig_zh      bkg\n"
+            dc += "process      0           1\n"
+            dc += "rate         -1          -1\n"
+            dc += "####################\n"
+            #dc += "dummy lnN    -     1.00001\n"
+            dc += "bkg lnN      -           1.01\n"
+            #dc += "* autoMCStats 0 0 1\n"
 
 
-        f = open(f"{outDir}/datacard_{hName}.txt", 'w')
+        if ecm == 365:
+            inputDir = f"output/h_za/histmaker/ecm{ecm}_{cat}/"
+            hName, rebin = 'mva_score', 10
+            h_sig_zh = getHist(hName, sigs_zh, rebin=rebin)
+            h_sig_vbf = getHist(hName, sigs_vbf, rebin=rebin)
+            h_bkg = getHist(hName, bkgs, rebin=rebin)
+
+            h_sig_vbf = removeNegativeBins(h_sig_vbf)
+
+
+            h_sig_zh.SetName(f"{cat}_sig_zh")
+            h_sig_vbf.SetName(f"{cat}_sig_vbf")
+            h_bkg.SetName(f"{cat}_bkg")
+
+            fOut = ROOT.TFile(f"{outDir}/datacard_{cat}.root", "RECREATE")
+            h_sig_zh.Write()
+            h_sig_vbf.Write()
+            h_bkg.Write()
+            h_data = h_sig_zh.Clone(f"{cat}_data")
+            h_data.Add(h_sig_vbf)
+            h_data.Add(h_bkg)
+            h_data.Write()
+            fOut.Close()
+
+            dc = ""
+            dc += "imax *\n"
+            dc += "jmax *\n"
+            dc += "kmax *\n"
+            dc += "####################\n"
+            dc += f"shapes *        * datacard_{cat}.root $CHANNEL_$PROCESS\n"
+            dc += f"shapes data_obs * datacard_{cat}.root $CHANNEL_data\n"
+            dc += "####################\n"
+            dc += f"bin          {cat}\n"
+            dc += "observation  -1\n"
+            dc += "####################\n"
+            dc += f"bin          {cat}      {cat}      {cat}\n"
+            dc += "process      sig_zh      sig_vbf     bkg\n"
+            dc += "process      0           -2          1\n"
+            dc += "rate         -1          -1          -1\n"
+            dc += "####################\n"
+            #dc += "dummy lnN    -     -     1.00001\n"
+            dc += "bkg lnN      -           -           1.05\n"
+
+        f = open(f"{outDir}/datacard_{cat}.txt", 'w')
         f.write(dc)
         f.close()
 
         print(dc)
 
         if args.run:
-            cmd = f"singularity exec --bind /work:/work /work/submit/jaeyserm/software/docker/cmssw_cc7.sif bash -c 'PYTHONPATH=''; dir=$(pwd); cd /work/submit/jaeyserm/wmass/CMSSW_10_6_19_patch2/src; source /cvmfs/cms.cern.ch/cmsset_default.sh; cmsenv; cd $dir/{outDir}; text2hdf5.py --X-allow-no-background datacard_{hName}.txt -o ws_{hName}.hdf5; combinetf.py ws_{hName}.hdf5 -o fit_output_{hName}.root -t 0  --expectSignal=1'"
+            cmd = f"singularity exec --bind /work:/work /work/submit/jaeyserm/software/docker/cmssw_cc7.sif bash -c 'PYTHONPATH=''; dir=$(pwd); cd /work/submit/jaeyserm/wmass/CMSSW_10_6_19_patch2/src; source /cvmfs/cms.cern.ch/cmsset_default.sh; cmsenv; cd $dir/{outDir}; text2hdf5.py --X-allow-no-background datacard_{cat}.txt -o ws_{cat}.hdf5; combinetf.py ws_{cat}.hdf5 -o fit_output_{cat}.root -t -1  --expectSignal=1  '"
             os.system(cmd)
-    #quit()
+
 
     if args.run:
-        cards = ' '.join([f'datacard_{x}.txt' for x in hists])
+        cards = ' '.join([f'datacard_{x}.txt' for x in cats])
         cmd = f"singularity exec --bind /work:/work /work/submit/jaeyserm/software/docker/cmssw_cc7.sif bash -c 'PYTHONPATH=''; dir=$(pwd); cd /work/submit/jaeyserm/wmass/CMSSW_10_6_19_patch2/src; source /cvmfs/cms.cern.ch/cmsset_default.sh; cmsenv; cd $dir/{outDir}; combineCards.py {cards} > datacard_combined.txt'"
         os.system(cmd)
 
-        cmd = f"singularity exec --bind /work:/work /work/submit/jaeyserm/software/docker/cmssw_cc7.sif bash -c 'PYTHONPATH=''; dir=$(pwd); cd /work/submit/jaeyserm/wmass/CMSSW_10_6_19_patch2/src; source /cvmfs/cms.cern.ch/cmsset_default.sh; cmsenv; cd $dir/{outDir}; text2hdf5.py --X-allow-no-background datacard_combined.txt -o ws_combined.hdf5; combinetf.py ws_combined.hdf5 -o fit_output_combined.root -t 0  --expectSignal=1 '" # --binByBinStat
+        cmd = f"singularity exec --bind /work:/work /work/submit/jaeyserm/software/docker/cmssw_cc7.sif bash -c 'PYTHONPATH=''; dir=$(pwd); cd /work/submit/jaeyserm/wmass/CMSSW_10_6_19_patch2/src; source /cvmfs/cms.cern.ch/cmsset_default.sh; cmsenv; cd $dir/{outDir}; text2hdf5.py --X-allow-no-background datacard_combined.txt -o ws_combined.hdf5; combinetf.py ws_combined.hdf5 -o fit_output_combined.root -t -1  --expectSignal=1 '" # 
         os.system(cmd)
 
-        for hist in hists+['combined']:
-            fIn = ROOT.TFile(f"{outDir}/fit_output_{hist}.root")
+        for cat in cats+['combined']:
+            fIn = ROOT.TFile(f"{outDir}/fit_output_{cat}.root")
             tree = fIn.Get("fitresults")
             tree.GetEntry(0)
             status = tree.status
             errstatus = tree.errstatus
 
-            mu_zh = tree.sig_mu
-            mu_zh_err = tree.sig_mu_err*100.
-            print(f"{hist}\tzh={mu_zh_err:.3f} {status}")
+            if ecm == 365:
+                mu_zh = tree.sig_zh_mu
+                mu_zh_err = tree.sig_zh_mu_err*100.
+                mu_vbf = tree.sig_vbf_mu
+                mu_vbf_err = tree.sig_vbf_mu_err*100.
+                print(f"{cat}\tzh={mu_zh_err:.3f}\tvbf={mu_vbf_err:.3f} {status}")
+            else:
+                mu_zh = tree.sig_zh_mu
+                mu_zh_err = tree.sig_zh_mu_err*100.
+                print(f"{cat}\tzh={mu_zh_err:.3f} {status}")
 
 
-'''
-        if args.run:
-            #cmd = f"singularity exec --bind /work:/work /work/submit/jaeyserm/software/docker/combine-standalone_v9.2.1.sif bash -c 'cd {outDir}; text2workspace.py datacard_{cat}.txt -o ws_{cat}.root; combine -M MultiDimFit -v 10 --rMin 0.5 --rMax 1.5 --setParameters r=1 ws_{cat}.root'"
-            cmd = f"singularity exec --bind /work:/work /work/submit/jaeyserm/software/docker/combine-standalone_v9.2.1.sif bash -c 'cd {outDir}; text2workspace.py datacard_{hName}.txt -o ws_{hName}.root; combine -M FitDiagnostics -t -1 --setParameters r=1 ws_{hName}.root -n {hName} --cminDefaultMinimizerStrategy 0'"
-            os.system(cmd)
 
-    if args.run:
-        cards = ' '.join([f'datacard_{x}.txt' for x in hists])
-        cmd = f"singularity exec --bind /work:/work /work/submit/jaeyserm/software/docker/combine-standalone_v9.2.1.sif bash -c 'cd {outDir}; combineCards.py {cards} > datacard_combined.txt'"
-        os.system(cmd)
-
-        cmd = f"singularity exec --bind /work:/work /work/submit/jaeyserm/software/docker/combine-standalone_v9.2.1.sif bash -c 'cd {outDir}; text2workspace.py datacard_combined.txt -o ws_combined.root; combine -M FitDiagnostics -t -1 --setParameters r=1 ws_combined.root -n combined --cminDefaultMinimizerStrategy 0'"
-        os.system(cmd)
-
-        ## extract results
-        for hist in hists + ['combined']:
-            fIn = ROOT.TFile(f"{outDir}/fitDiagnostics{hist}.root")
-            t = fIn.Get("tree_fit_sb")
-            t.GetEntry(0)
-            err = t.rErr
-            status = t.fit_status
-            print(f"{hist}\t{err:.3f} {status}")
-
-'''

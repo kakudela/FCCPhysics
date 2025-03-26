@@ -3,7 +3,7 @@ import ROOT
 import os
 
 def run_fit(cats, target, pert, extraArgs):
-    cmd = f"python FCCPhysics/analyses/h_zh/combine.py --cats {cats} --run  --target {target} --pert {pert} {extraArgs}"
+    cmd = f"python FCCPhysics/analyses/h_zh/combine.py --cats {cats} --run --ecm {ecm}  --target {target} --pert {pert} {extraArgs}"
     os.system(cmd)
 
     if '-' in cats:
@@ -21,11 +21,12 @@ def run_fit(cats, target, pert, extraArgs):
 
 if __name__ == "__main__":
 
+    ecm = 365 # 240 365
     extraArgs = "--freezeBackgrounds"
     #extraArgs = "--floatBackgrounds"
     extraArgs = ""
-    pert = 1.05
-    cats = "qq-mumu-ee"
+    pert = 1.01
+    cats = "qq"
     h_decays = ["bb", "cc", "gg", "ss", "mumu", "tautau", "ZZ", "WW", "Za", "aa", "inv"]
 
     res = []

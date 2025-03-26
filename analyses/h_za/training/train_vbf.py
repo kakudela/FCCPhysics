@@ -48,7 +48,8 @@ tag = "vbf" # hqqa hvva
 
 inputDir = "/ceph/submit/data/group/fcc/ee/analyses/h_za/treemaker/ecm365/vbf/"
 
-variables = ["qq_m", "qq_p", "qqa_p", "qq_trans", "vv_trans", "vv_long", "qq_long", "dr_vv_qqa", "dr_vv_qq", "dr_a_qq", "dr_a_vv", "cos_qqa", "cos_qq", "jet1_p", "jet2_p", "jet1_theta", "jet2_theta", "photon_p", "photon_theta"]
+variables = ["qq_m", "qq_p", "qqa_m", "qqa_p", "qq_trans", "vv_trans", "vv_long", "qq_long", "dr_vv_qqa", "dr_vv_qq", "dr_a_qq", "dr_a_vv", "cos_qqa", "cos_qq", "jet1_p", "jet2_p", "jet1_theta", "jet2_theta", "photon_p", "photon_theta"]
+
 
 sig_procs = ['wzp6_ee_nuenueH_HZa_ecm365']
 bkg_procs = ['p8_ee_ZZ_ecm365']
@@ -107,59 +108,13 @@ test_weights = test_weights.to_numpy()
 
 
 
-params = {
-    'objective': 'binary:logistic',
-    'eval_metric': 'logloss',
-    'eta': 0.1,
-    'max_depth': 3,
-    'subsample': 0.5,
-    'colsample_bytree': 0.5,
-    'seed': 42,
-    'n_estimators': 350, # low number for testing purposes (default 350)
-    'early_stopping_rounds': 1,
-    'num_rounds': 20,
-    'learning_rate': 0.20,
-    'gamma': 3,
-    'min_child_weight': 10,
-    'max_delta_step': 0,
-}
-
-parms_opt = {
-    'objective': 'binary:logistic',
-    'eval_metric': 'logloss',
-    'eta': 0.1,
-    'max_depth': 5,
-    'subsample': 0.8,
-    'colsample_bytree': 0.8,
-    'seed': 42,
-    'n_estimators': 500, # low number for testing purposes (default 350)
-    'early_stopping_rounds': 10,
-    'num_rounds': 20,
-    'learning_rate': 0.05,
-    'gamma': 0.1,
-    'min_child_weight': 10,
-    'max_delta_step': 0,
-    'reg_alpha': 0.1,
-    'reg_lambda': 1.0,
-    'use_label_encoder': False,
-}
-
-parms_softprob = {
-    'objective': 'binary:logistic',
-    'eval_metric': 'logloss',
-    'n_estimators': 2000,
-    'max_depth': 8,
-    #'eval_metric': ["merror", "mlogloss"],
-    'early_stopping_rounds': 10,
-}
-
 
 
 # train the XGBoost model
 print("Start training")
 #eval_set = [(train_data, train_labels), (test_data, test_labels)]
 eval_set = [(train_data, train_labels), (test_data, test_labels)]
-bdt = xgb.XGBClassifier(**parms_opt)
+bdt = xgb.XGBClassifier(**parms)
 #bdt.fit(train_data, train_labels, verbose=True, eval_set=eval_set, sample_weight=train_weights)
 bdt.fit(train_data, train_labels, verbose=True, eval_set=eval_set, sample_weight_eval_set=[train_weights, test_weights])
 

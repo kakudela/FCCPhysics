@@ -7,222 +7,145 @@ ROOT.TH1.SetDefaultSumw2(ROOT.kTRUE)
 from addons.TMVAHelper.TMVAHelper import TMVAHelperXGB
 
 ecm = 240 # 240 365
-flavor = "mumu" # ee mumu
 
-# list of all processes
 fraction = 1
 
 
-processBkg = {
+processListBkg = {
 
-    'p8_ee_WW_ecm240':                  {'fraction':fraction},
-    'p8_ee_WW_mumu_ecm240':             {'fraction':fraction},
-    'p8_ee_WW_ee_ecm240':               {'fraction':fraction},
-    'p8_ee_ZZ_ecm240':                  {'fraction':fraction},
-    'wz3p6_ee_uu_ecm240':               {'fraction':fraction},
-    'wz3p6_ee_dd_ecm240':               {'fraction':fraction},
-    'wz3p6_ee_cc_ecm240':               {'fraction':fraction},
-    'wz3p6_ee_ss_ecm240':               {'fraction':fraction},
-    'wz3p6_ee_bb_ecm240':               {'fraction':fraction},
-    'wz3p6_ee_tautau_ecm240':           {'fraction':fraction},
-    'wz3p6_ee_mumu_ecm240':             {'fraction':fraction},
-    'wz3p6_ee_ee_Mee_30_150_ecm240':    {'fraction':fraction},
-    'wz3p6_ee_nunu_ecm240':             {'fraction':fraction},
+    f'p8_ee_WW_ecm{ecm}':                  {'fraction':fraction},
+    f'p8_ee_WW_mumu_ecm{ecm}':             {'fraction':fraction},
+    f'p8_ee_WW_ee_ecm{ecm}':               {'fraction':fraction},
+    f'p8_ee_ZZ_ecm{ecm}':                  {'fraction':fraction},
+    f'wz3p6_ee_uu_ecm{ecm}':               {'fraction':fraction},
+    f'wz3p6_ee_dd_ecm{ecm}':               {'fraction':fraction},
+    f'wz3p6_ee_cc_ecm{ecm}':               {'fraction':fraction},
+    f'wz3p6_ee_ss_ecm{ecm}':               {'fraction':fraction},
+    f'wz3p6_ee_bb_ecm{ecm}':               {'fraction':fraction},
+    f'wz3p6_ee_tautau_ecm{ecm}':           {'fraction':fraction},
+    f'wz3p6_ee_mumu_ecm{ecm}':             {'fraction':fraction},
+    f'wz3p6_ee_ee_Mee_30_150_ecm{ecm}':    {'fraction':fraction},
+    f'wz3p6_ee_nunu_ecm{ecm}':             {'fraction':fraction},
 
-    'wzp6_egamma_eZ_Zmumu_ecm240':      {'fraction':fraction},
-    'wzp6_gammae_eZ_Zmumu_ecm240':      {'fraction':fraction},
-    'wzp6_gaga_mumu_60_ecm240':         {'fraction':fraction},
+    f'wzp6_egamma_eZ_Zmumu_ecm{ecm}':      {'fraction':fraction},
+    f'wzp6_gammae_eZ_Zmumu_ecm{ecm}':      {'fraction':fraction},
+    f'wzp6_gaga_mumu_60_ecm{ecm}':         {'fraction':fraction},
 
-    'wzp6_egamma_eZ_Zee_ecm240':        {'fraction':fraction},
-    'wzp6_gammae_eZ_Zee_ecm240':        {'fraction':fraction},
-    'wzp6_gaga_ee_60_ecm240':           {'fraction':fraction},
-    'wzp6_gaga_tautau_60_ecm240':       {'fraction':fraction},
-    'wzp6_ee_nuenueZ_ecm240':           {'fraction':fraction},
+    f'wzp6_egamma_eZ_Zee_ecm{ecm}':        {'fraction':fraction},
+    f'wzp6_gammae_eZ_Zee_ecm{ecm}':        {'fraction':fraction},
+    f'wzp6_gaga_ee_60_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_gaga_tautau_60_ecm{ecm}':       {'fraction':fraction},
+    f'wzp6_ee_nuenueZ_ecm{ecm}':           {'fraction':fraction},
 }
 
 processListSignal = {
 
-    'wzp6_ee_qqH_Hbb_ecm240':           {'fraction':fraction},
-    'wzp6_ee_qqH_Hcc_ecm240':           {'fraction':fraction},
-    'wzp6_ee_qqH_Hss_ecm240':           {'fraction':fraction},
-    'wzp6_ee_qqH_Hgg_ecm240':           {'fraction':fraction},
-    'wzp6_ee_qqH_Haa_ecm240':           {'fraction':fraction},
-    'wzp6_ee_qqH_HZa_ecm240':           {'fraction':fraction},
-    'wzp6_ee_qqH_HWW_ecm240':           {'fraction':fraction},
-    'wzp6_ee_qqH_HZZ_ecm240':           {'fraction':fraction},
-    'wzp6_ee_qqH_Hmumu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_qqH_Htautau_ecm240':       {'fraction':fraction},
-    'wz3p6_ee_qqH_Hinv_ecm240':         {'fraction':fraction},
+    f'wzp6_ee_qqH_Hbb_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_qqH_Hcc_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_qqH_Hss_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_qqH_Hgg_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_qqH_Haa_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_qqH_HZa_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_qqH_HWW_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_qqH_HZZ_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_qqH_Hmumu_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_qqH_Htautau_ecm{ecm}':       {'fraction':fraction},
+    f'wz3p6_ee_qqH_Hinv_ecm{ecm}':         {'fraction':fraction},
 
-    'wzp6_ee_ssH_Hbb_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ssH_Hcc_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ssH_Hss_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ssH_Hgg_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ssH_Haa_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ssH_HZa_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ssH_HWW_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ssH_HZZ_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ssH_Hmumu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_ssH_Htautau_ecm240':       {'fraction':fraction},
-    'wz3p6_ee_ssH_Hinv_ecm240':         {'fraction':fraction},
+    f'wzp6_ee_ssH_Hbb_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ssH_Hcc_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ssH_Hss_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ssH_Hgg_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ssH_Haa_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ssH_HZa_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ssH_HWW_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ssH_HZZ_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ssH_Hmumu_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_ssH_Htautau_ecm{ecm}':       {'fraction':fraction},
+    f'wz3p6_ee_ssH_Hinv_ecm{ecm}':         {'fraction':fraction},
 
-    'wzp6_ee_ccH_Hbb_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ccH_Hcc_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ccH_Hss_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ccH_Hgg_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ccH_Haa_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ccH_HZa_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ccH_HWW_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ccH_HZZ_ecm240':           {'fraction':fraction},
-    'wzp6_ee_ccH_Hmumu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_ccH_Htautau_ecm240':       {'fraction':fraction},
-    'wz3p6_ee_ccH_Hinv_ecm240':         {'fraction':fraction},
-
-
-    'wzp6_ee_bbH_Hbb_ecm240':           {'fraction':fraction},
-    'wzp6_ee_bbH_Hcc_ecm240':           {'fraction':fraction},
-    'wzp6_ee_bbH_Hss_ecm240':           {'fraction':fraction},
-    'wzp6_ee_bbH_Hgg_ecm240':           {'fraction':fraction},
-    'wzp6_ee_bbH_Haa_ecm240':           {'fraction':fraction},
-    'wzp6_ee_bbH_HZa_ecm240':           {'fraction':fraction},
-    'wzp6_ee_bbH_HWW_ecm240':           {'fraction':fraction},
-    'wzp6_ee_bbH_HZZ_ecm240':           {'fraction':fraction},
-    'wzp6_ee_bbH_Hmumu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_bbH_Htautau_ecm240':       {'fraction':fraction},
-    'wz3p6_ee_bbH_Hinv_ecm240':         {'fraction':fraction},
+    f'wzp6_ee_ccH_Hbb_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ccH_Hcc_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ccH_Hss_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ccH_Hgg_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ccH_Haa_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ccH_HZa_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ccH_HWW_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ccH_HZZ_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_ccH_Hmumu_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_ccH_Htautau_ecm{ecm}':       {'fraction':fraction},
+    f'wz3p6_ee_ccH_Hinv_ecm{ecm}':         {'fraction':fraction},
 
 
-    'wzp6_ee_eeH_Hbb_ecm240':           {'fraction':fraction},
-    'wzp6_ee_eeH_Hcc_ecm240':           {'fraction':fraction},
-    'wzp6_ee_eeH_Hss_ecm240':           {'fraction':fraction},
-    'wzp6_ee_eeH_Hgg_ecm240':           {'fraction':fraction},
-    'wzp6_ee_eeH_Haa_ecm240':           {'fraction':fraction},
-    'wzp6_ee_eeH_HZa_ecm240':           {'fraction':fraction},
-    'wzp6_ee_eeH_HWW_ecm240':           {'fraction':fraction},
-    'wzp6_ee_eeH_HZZ_ecm240':           {'fraction':fraction},
-    'wzp6_ee_eeH_Hmumu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_eeH_Htautau_ecm240':       {'fraction':fraction},
-    'wz3p6_ee_eeH_Hinv_ecm240':         {'fraction':fraction},
-
-    'wzp6_ee_mumuH_Hbb_ecm240':         {'fraction':fraction},
-    'wzp6_ee_mumuH_Hcc_ecm240':         {'fraction':fraction},
-    'wzp6_ee_mumuH_Hss_ecm240':         {'fraction':fraction},
-    'wzp6_ee_mumuH_Hgg_ecm240':         {'fraction':fraction},
-    'wzp6_ee_mumuH_Haa_ecm240':         {'fraction':fraction},
-    'wzp6_ee_mumuH_HZa_ecm240':         {'fraction':fraction},
-    'wzp6_ee_mumuH_HWW_ecm240':         {'fraction':fraction},
-    'wzp6_ee_mumuH_HZZ_ecm240':         {'fraction':fraction},
-    'wzp6_ee_mumuH_Hmumu_ecm240':       {'fraction':fraction},
-    'wzp6_ee_mumuH_Htautau_ecm240':     {'fraction':fraction},
-    'wz3p6_ee_mumuH_Hinv_ecm240':       {'fraction':fraction},
-
-    'wzp6_ee_tautauH_Hbb_ecm240':       {'fraction':fraction},
-    'wzp6_ee_tautauH_Hcc_ecm240':       {'fraction':fraction},
-    'wzp6_ee_tautauH_Hss_ecm240':       {'fraction':fraction},
-    'wzp6_ee_tautauH_Hgg_ecm240':       {'fraction':fraction},
-    'wzp6_ee_tautauH_Haa_ecm240':       {'fraction':fraction},
-    'wzp6_ee_tautauH_HZa_ecm240':       {'fraction':fraction},
-    'wzp6_ee_tautauH_HWW_ecm240':       {'fraction':fraction},
-    'wzp6_ee_tautauH_HZZ_ecm240':       {'fraction':fraction},
-    'wzp6_ee_tautauH_Hmumu_ecm240':     {'fraction':fraction},
-    'wzp6_ee_tautauH_Htautau_ecm240':   {'fraction':fraction},
-    'wz3p6_ee_tautauH_Hinv_ecm240':     {'fraction':fraction},
+    f'wzp6_ee_bbH_Hbb_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_bbH_Hcc_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_bbH_Hss_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_bbH_Hgg_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_bbH_Haa_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_bbH_HZa_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_bbH_HWW_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_bbH_HZZ_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_bbH_Hmumu_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_bbH_Htautau_ecm{ecm}':       {'fraction':fraction},
+    f'wz3p6_ee_bbH_Hinv_ecm{ecm}':         {'fraction':fraction},
 
 
-    'wzp6_ee_nunuH_Hbb_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_Hcc_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_Hss_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_Hgg_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_Haa_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_HZa_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_HWW_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_HZZ_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_Hmumu_ecm240':       {'fraction':fraction},
-    'wzp6_ee_nunuH_Htautau_ecm240':     {'fraction':fraction},
-    'wz3p6_ee_nunuH_Hinv_ecm240':       {'fraction':fraction},
+    f'wzp6_ee_eeH_Hbb_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_eeH_Hcc_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_eeH_Hss_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_eeH_Hgg_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_eeH_Haa_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_eeH_HZa_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_eeH_HWW_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_eeH_HZZ_ecm{ecm}':           {'fraction':fraction},
+    f'wzp6_ee_eeH_Hmumu_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_eeH_Htautau_ecm{ecm}':       {'fraction':fraction},
+    f'wz3p6_ee_eeH_Hinv_ecm{ecm}':         {'fraction':fraction},
+
+    f'wzp6_ee_mumuH_Hbb_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_mumuH_Hcc_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_mumuH_Hss_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_mumuH_Hgg_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_mumuH_Haa_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_mumuH_HZa_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_mumuH_HWW_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_mumuH_HZZ_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_mumuH_Hmumu_ecm{ecm}':       {'fraction':fraction},
+    f'wzp6_ee_mumuH_Htautau_ecm{ecm}':     {'fraction':fraction},
+    f'wz3p6_ee_mumuH_Hinv_ecm{ecm}':       {'fraction':fraction},
+
+    f'wzp6_ee_tautauH_Hbb_ecm{ecm}':       {'fraction':fraction},
+    f'wzp6_ee_tautauH_Hcc_ecm{ecm}':       {'fraction':fraction},
+    f'wzp6_ee_tautauH_Hss_ecm{ecm}':       {'fraction':fraction},
+    f'wzp6_ee_tautauH_Hgg_ecm{ecm}':       {'fraction':fraction},
+    f'wzp6_ee_tautauH_Haa_ecm{ecm}':       {'fraction':fraction},
+    f'wzp6_ee_tautauH_HZa_ecm{ecm}':       {'fraction':fraction},
+    f'wzp6_ee_tautauH_HWW_ecm{ecm}':       {'fraction':fraction},
+    f'wzp6_ee_tautauH_HZZ_ecm{ecm}':       {'fraction':fraction},
+    f'wzp6_ee_tautauH_Hmumu_ecm{ecm}':     {'fraction':fraction},
+    f'wzp6_ee_tautauH_Htautau_ecm{ecm}':   {'fraction':fraction},
+    f'wz3p6_ee_tautauH_Hinv_ecm{ecm}':     {'fraction':fraction},
+
+
+    f'wzp6_ee_nunuH_Hbb_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_nunuH_Hcc_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_nunuH_Hss_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_nunuH_Hgg_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_nunuH_Haa_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_nunuH_HZa_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_nunuH_HWW_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_nunuH_HZZ_ecm{ecm}':         {'fraction':fraction},
+    f'wzp6_ee_nunuH_Hmumu_ecm{ecm}':       {'fraction':fraction},
+    f'wzp6_ee_nunuH_Htautau_ecm{ecm}':     {'fraction':fraction},
+    f'wz3p6_ee_nunuH_Hinv_ecm{ecm}':       {'fraction':fraction},
 
 }
 
-processListSignalRare = {
-
-    'wzp6_ee_qqH_Hbs_ecm240':         {'fraction':fraction},
-    'wzp6_ee_qqH_Hbd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_qqH_Hcu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_qqH_Hsd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_bbH_Hbs_ecm240':         {'fraction':fraction},
-    'wzp6_ee_bbH_Hbd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_bbH_Hcu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_bbH_Hsd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_ccH_Hbs_ecm240':         {'fraction':fraction},
-    'wzp6_ee_ccH_Hbd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_ccH_Hcu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_ccH_Hsd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_ssH_Hbs_ecm240':         {'fraction':fraction},
-    'wzp6_ee_ssH_Hbd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_ssH_Hcu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_ssH_Hsd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_eeH_Hbs_ecm240':         {'fraction':fraction},
-    'wzp6_ee_eeH_Hbd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_eeH_Hcu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_eeH_Hsd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_mumuH_Hbs_ecm240':         {'fraction':fraction},
-    'wzp6_ee_mumuH_Hbd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_mumuH_Hcu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_mumuH_Hsd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_tautauH_Hbs_ecm240':         {'fraction':fraction},
-    'wzp6_ee_tautauH_Hbd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_tautauH_Hcu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_tautauH_Hsd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_Hbs_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_Hbd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_Hcu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_Hsd_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_Huu_ecm240':         {'fraction':fraction},
-    'wzp6_ee_nunuH_Hdd_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_bbH_Hdd_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_bbH_Hee_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_bbH_Htaue_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_bbH_Htaumu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_bbH_Huu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_ccH_Hdd_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_ccH_Hee_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_ccH_Htaue_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_ccH_Htaumu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_ccH_Huu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_eeH_Hdd_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_eeH_Hee_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_eeH_Htaue_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_eeH_Htaumu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_eeH_Huu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_mumuH_Hdd_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_mumuH_Hee_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_mumuH_Htaue_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_mumuH_Htaumu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_mumuH_Huu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_nunuH_Hee_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_nunuH_Htaue_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_nunuH_Htaumu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_qqH_Hdd_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_qqH_Hee_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_qqH_Htaue_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_qqH_Htaumu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_qqH_Huu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_ssH_Hdd_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_ssH_Hee_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_ssH_Htaue_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_ssH_Htaumu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_ssH_Huu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_tautauH_Hdd_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_tautauH_Hee_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_tautauH_Htaue_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_tautauH_Htaumu_ecm240':         {'fraction':fraction},
-    'wz3p6_ee_tautauH_Huu_ecm240':         {'fraction':fraction},
-}
 
 
-processList = processListSignal | processListSignalRare | processBkg
-processList = processListSignal | processBkg
-#processList = processBkg
+
+processList = processListSignal | processListBkg
+#processList = processListSignal
 
 inputDir = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
 procDict = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/samplesDict.json"
@@ -232,15 +155,14 @@ includePaths = ["../../functions/functions.h", "../../functions/functions_gen.h"
 
 
 # output directory
-outputDir   = f"output/h_zh_leptonic/histmaker/ecm{ecm}/mrec_100_150/"
-
+outputDir   = f"output/h_zh_leptonic/histmaker/ecm{ecm}/"
 
 # optional: ncpus, default is 4, -1 uses all cores available
 nCPUS       = 64
 
 # scale the histograms with the cross-section and integrated luminosity
 doScale = True
-intLumi = 10.8e6
+intLumi = 10.8e6 if ecm == 240 else 3e6
 
 
 # define histograms
@@ -267,9 +189,9 @@ bins_resolution = (10000, 0.95, 1.05)
 bins_m_fine = (100, 120, 130) # 100 MeV bins
 
 ROOT.EnableImplicitMT(nCPUS) # hack to deal correctly with TMVAHelperXGB
-tmva_helper_mumu = TMVAHelperXGB("FCCPhysics/analyses/h_zh/trainings/xgb_bdt_mumu_converted.root", "ZH_Recoil_BDT")
+tmva_helper_mumu = TMVAHelperXGB(f"FCCPhysics/analyses/h_zh/bdt_leptonic/xgb_bdt_mumu_{ecm}_converted.root", "ZH_Recoil_BDT")
 #tmva_helper_mumu = TMVAHelperXGB("FCCPhysics/analyses/h_zh/trainings/xgb_bdt_mumu_new_v0_converted.root", "ZH_Recoil_BDT")
-tmva_helper_ee = TMVAHelperXGB("FCCPhysics/analyses/h_zh/trainings/xgb_bdt_ee_converted.root", "ZH_Recoil_BDT")
+tmva_helper_ee = TMVAHelperXGB(f"FCCPhysics/analyses/h_zh/bdt_leptonic/xgb_bdt_ee_{ecm}_converted.root", "ZH_Recoil_BDT")
 
 def build_graph_ll(df, hists, dataset, ch):
 
@@ -386,7 +308,10 @@ def build_graph_ll(df, hists, dataset, ch):
     ### CUT 4: Z momentum
     #########
     hists.append(df.Histo1D((f"{ch}_zll_p_nOne", "", *bins_p_mu), "zll_p"))
-    df = df.Filter("zll_p > 20 && zll_p < 70")
+    if ecm == 240:
+        df = df.Filter("zll_p > 20 && zll_p < 70")
+    if ecm == 365:
+        df = df.Filter("zll_p > 50 && zll_p < 150")
     #df = df.Filter("zll_p > 20 && zll_p < 55")
     #df = df.Filter("zll_p > 10 && zll_p < 70") # ILC
     hists.append(df.Histo1D((f"{ch}_cutFlow", "", *bins_count), "cut4"))
@@ -442,19 +367,17 @@ def build_graph_ll(df, hists, dataset, ch):
     hists.append(df.Histo2D((f"{ch}_zll_recoil_m", "", *(bins_recoil_fine + bins_cat)), "zll_recoil_m", "zll_category"))
     hists.append(df.Histo1D((f"{ch}_zll_recoil_m_final", "", *(bins_m_fine)), "zll_recoil_m"))
 
-    mva_sign = 0.83 if ch == "mumu" else 0.88 # max significance
+    if ch == "mumu" and ecm == 240: mva_sign = 0.83
+    if ch == "mumu" and ecm == 365: mva_sign = 0.66
+    if ch == "ee" and ecm == 240: mva_sign = 0.88
+    if ch == "ee" and ecm == 365: mva_sign = 0.76
+    #mva_sign = 0.83 if ch == "mumu" else 0.88 # max significance
     bins_mva_ = [0, mva_sign, 1]
     bins_mrec_ = list(np.arange(100, 150.5, 0.5))
     bins_mva = array.array('d', bins_mva_)
     bins_mrec = array.array('d', bins_mrec_)
     model = ROOT.RDF.TH2DModel(f"{ch}_recoil_m_mva", "", len(bins_mrec_)-1, bins_mrec, len(bins_mva_)-1, bins_mva)
     hists.append(df.Histo2D(model, "zll_recoil_m", "mva_score"))
-
-
-    #bins_mrec_extended_ = list(np.arange(100, 150.5, 0.5)) # range(100, 151, 1)
-    #bins_mrec_extended = array.array('d', bins_mrec_extended_)
-    #model_extended = ROOT.RDF.TH2DModel(f"{ch}_recoil_m_mva_extended", "", len(bins_mrec_extended_)-1, bins_mrec_extended, len(bins_mva_)-1, bins_mva)
-    #hists.append(df.Histo2D(model_extended, "zll_recoil_m", "mva_score"))
 
 
     # separate recoil plots
