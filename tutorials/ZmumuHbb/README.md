@@ -1,6 +1,6 @@
 
 # Analyzing events for FCC-ee
-In this tutorial, we're going to analyze events from the **FCC-ee** and measure cross-sections for selected processes. Throughout the tutorial, you'll learn how to perform a basic analysis, fit histograms, apply jet clustering and flavor tagging, and use machine learning techniques:
+In this tutorial, we're going to analyze events from the FCC-ee and measure cross-sections for selected processes. Throughout the tutorial, you'll learn how to perform a basic analysis, fit histograms, apply jet clustering and flavor tagging, and use machine learning techniques:
 
 - **Part I:** Basic analysis and event selection, plotting, and cross-section measurement  
 - **Part II:** Fitting of histograms  
@@ -18,7 +18,7 @@ Instructions for account creation, logging in into the SubMIT cluster can be fou
 
 
 #### FCCAnalysis framework
-We will be working with the **FCCAnalyses** framework, available on [GitHub](https://github.com/HEP-FCC/FCCAnalyses). This is a common analysis framework developed for FCC-related studies. It lets you run full analyses over existing simulated samples, apply event selections, and produce plots and histograms. The input samples used in this tutorial are available [here](https://fcc-physics-events.web.cern.ch/fcc-ee/delphes/winter2023/idea/).
+We will be working with the FCCAnalyses framework, available on [GitHub](https://github.com/HEP-FCC/FCCAnalyses). This is a common analysis framework developed for FCC-related studies. It lets you run full analyses over existing simulated samples, apply event selections, and produce plots and histograms. The input samples used in this tutorial are available [here](https://fcc-physics-events.web.cern.ch/fcc-ee/delphes/winter2023/idea/).
 
 
 If you are running the tutorial on the MIT computing infrastructure, there is a pre-installed version of the analysis software available. You can set it up by running (this command must be executed every time you log into a new terminal session):
@@ -38,7 +38,7 @@ If you're running at CERN or prefer to install the analysis framework yourself, 
     source ./setup.sh
     fccanalysis build -j 8
 
-These setup steps need to be executed only **once** during the initial installation.
+These setup steps need to be executed only once during the initial installation.
 
 For subsequent sessions, simply run:
 
@@ -133,7 +133,7 @@ To visualize the histograms and the cutflow plot, run the following command:
 
 Make sure to specify the input and output directories inside the `plots.py` script (e.g. if you want to plot and run the pre-generated files as explained above, you should point to that directory).
 
-The **cutflow plot** provides a clear illustration of how background events are progressively reduced by each selection cut, while ideally retaining the signal. To quantify the efficiency of this selection, we calculate the significance:
+The cutflow plot provides a clear illustration of how background events are progressively reduced by each selection cut, while ideally retaining the signal. To quantify the efficiency of this selection, we calculate the significance:
 
 ```math
 \rm significance = \frac{S}{\sqrt{S + B}},
@@ -145,7 +145,7 @@ where `S` and `B` are the number of signal and background events, respectively, 
 \rm significance = \sqrt{S},
 ```
 
-and the **uncertainty** on the signal yield becomes:
+and the uncertainty on the signal yield becomes:
 
 ```math
 \rm uncertainty =\frac{1}{\sqrt{S}}.
@@ -161,9 +161,9 @@ Now try tightening the recoil mass cut to see if you can further improve the sig
 
 
 # Part II: Statistical Analysis
-From the definition of significance above, we can also evaluate it **bin-by-bin**, treating each histogram bin as a separate measurement. Instead of tightening the recoil mass cut, we can instead **combine information from all bins** to extract a **single uncertainty** on the signal yield.
+From the definition of significance above, we can also evaluate it bin-by-bin, treating each histogram bin as a separate measurement. Instead of tightening the recoil mass cut, we can instead combine information from all bins to extract a single uncertainty on the signal yield.
 
-This is achieved using a **likelihood fit**, which does this combination optimally. The advantage of likelihood fits is that they also allow you to assign **systematic uncertainties** on both signal and background components — although that’s beyond the scope of this tutorial.
+This is achieved using a likelihood fit, which does this combination optimally. The advantage of likelihood fits is that they also allow you to assign systematic uncertainties on both signal and background components — although that’s beyond the scope of this tutorial.
 
 ## Preparing the Datacards
 To extract the uncertainty on the signal cross-section, we first need to prepare the Combine-compatible datacards. Use the following command to generate the required text and ROOT files containing the final histograms:
@@ -232,7 +232,7 @@ Think about:
 ## Extract the uncertainty for H → bb̄ 
 The Higgs boson predominantly decays to a pair of b-quarks, with a branching ratio of approximately 58%. One of the key objectives of FCC-ee is to precisely measure the cross section for H → bb̄, which directly relates to the Higgs coupling to b-quarks.
 
-So far, we have considered all Higgs decay modes (H → bb̄, cc̄, τ⁺τ⁻, WW, ZZ, etc.) as signal. To focus specifically on H → bb̄, we must redefine the signal** and background processes in the Combine setup:
+So far, we have considered all Higgs decay modes (H → bb̄, cc̄, τ⁺τ⁻, WW, ZZ, etc.) as signal. To focus specifically on H → bb̄, we must redefine the signal and background processes in the Combine setup:
 
     sig_procs = {'sig': ['wzp6_ee_mumuH_Hbb_ecm240']}
     bkg_procs = {
