@@ -53,7 +53,7 @@ We’ve prepared a few Python files to guide you through this tutorial. You can 
 You can either download the files individually from the repository or clone the entire repository using:
 
     git clone https://github.com/jeyserma/FCCPhysics.git
-    cd tutorials/ZmumuHbb
+    cd FCCPhysics/tutorials/ZmumuHbb
 
 
 
@@ -78,9 +78,10 @@ More information on how to compile the package locally and use all its features 
 # Part I: Measuring a Cross-Section
 In this first part of the tutorial, we will perform a basic event selection at the Higgs threshold. Our target process is:
 
-$$
+```math
 	\rm e⁺+e⁻ → ZH
-$$
+```
+
 with the Z boson decaying into a pair of muons (Z → μ⁺μ⁻), and the Higgs boson allowed to decay into any final state.
 
 We aim to extract the total Higgs production cross-section using the recoil method. To isolate the signal, we perform a cutflow analysis to reduce the main backgrounds, which include:
@@ -133,19 +134,22 @@ To visualize the histograms and the cutflow plot, run the following command:
 Make sure to specify the input and output directories inside the `plots.py` script (e.g. if you want to plot and run the pre-generated files as explained above, you should point to that directory).
 
 The **cutflow plot** provides a clear illustration of how background events are progressively reduced by each selection cut, while ideally retaining the signal. To quantify the efficiency of this selection, we calculate the significance:
-$$
+
+```math
 \rm significance = \frac{S}{\sqrt{S + B}},
-$$
+```
 
 where `S` and `B` are the number of signal and background events, respectively, after each cut. As background is reduced and signal is preserved, the significance increases. This value reflects how confidently we can measure the signal in the presence of background. The uncertainty, in %, on the signal is calculated as 1/significance. In the special case where background is negligible, this expression simplifies to:
-$$
+
+```math
 \rm significance = \sqrt{S},
-$$
+```
 
 and the **uncertainty** on the signal yield becomes:
-$$
+
+```math
 \rm uncertainty =\frac{1}{\sqrt{S}}.
-$$
+```
 
 Maximizing the significance and mimnimizing the uncertainty is a key goal in any physics analysis — it's our job as physicists! More advanced methods, such as Machine Learning (covered later), can help you push this even further.
 
