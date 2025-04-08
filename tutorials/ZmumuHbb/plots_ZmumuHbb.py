@@ -8,8 +8,11 @@ energy         = 240.0
 collider       = 'FCC-ee'
 formats        = ['png','pdf']
 
-outdir         = "/home/submit/jaeyserm/public_html/fccee/tutorials/mumuHbb/"
-inputDir       = "output/ZmumuH/histmaker/"
+outdir         = "output/ZmumuHbb/plots/"
+inputDir       = "output/ZmumuHbb/histmaker/"
+# You can also use the pre-generated files
+# /ceph/submit/data/group/fcc/ee/tutorials/FNAL2025/ZmumuHbb/histmaker/ MIT
+# /eos/project/f/fccsw-web/www/tutorials/FNAL2025/ZmumuHbb/histmaker/ CERN
 
 plotStatUnc    = False
 leg_position = [0.8, 0.7, 0.96, 0.88]
@@ -17,9 +20,9 @@ leg_position = [0.8, 0.7, 0.96, 0.88]
 procs = ["", "", ""]
 
 procs = {}
-procs['signal'] = {'ZH':['wzp6_ee_mumuH_Hbb_ecm240', 'wzp6_ee_mumuH_Hcc_ecm240', 'wzp6_ee_mumuH_Hss_ecm240', 'wzp6_ee_mumuH_Hgg_ecm240', 'wzp6_ee_mumuH_Haa_ecm240', 'wzp6_ee_mumuH_HZa_ecm240', 'wzp6_ee_mumuH_HWW_ecm240', 'wzp6_ee_mumuH_HZZ_ecm240', 'wzp6_ee_mumuH_Hmumu_ecm240', 'wzp6_ee_mumuH_Htautau_ecm240', 'wz3p6_ee_mumuH_Hinv_ecm240']}
+procs['signal'] = {'ZH':['wzp6_ee_mumuH_Hbb_ecm240', 'wzp6_ee_mumuH_Hcc_ecm240', 'wzp6_ee_mumuH_Hss_ecm240', 'wzp6_ee_mumuH_Hgg_ecm240', 'wzp6_ee_mumuH_Haa_ecm240', 'wzp6_ee_mumuH_HZa_ecm240', 'wzp6_ee_mumuH_HWW_ecm240', 'wzp6_ee_mumuH_HZZ_ecm240', 'wzp6_ee_mumuH_Hmumu_ecm240', 'wzp6_ee_mumuH_Htautau_ecm240']}
 procs['backgrounds'] =  {
-    'Zgamma':['wz3p6_ee_mumu_ecm240', 'wz3p6_ee_tautau_ecm240'],
+    'Zgamma':['wzp6_ee_mumu_ecm240', 'wzp6_ee_tautau_ecm240'],
     'WW':['p8_ee_WW_mumu_ecm240'],
     'ZZ':['p8_ee_ZZ_ecm240'],
     }

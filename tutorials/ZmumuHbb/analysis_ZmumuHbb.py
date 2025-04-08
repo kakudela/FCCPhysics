@@ -2,20 +2,20 @@
 import ROOT
 import array
 import numpy as np
+import socket
 
 ROOT.TH1.SetDefaultSumw2(ROOT.kTRUE)
 from addons.TMVAHelper.TMVAHelper import TMVAHelperXGB
 
 
-fraction = 0.02
-
+# this number is used to run only on a fraction of the Monte Carlo samples, which can speed up the analysis
+fraction = 1
 
 processList = {
-
     'p8_ee_WW_mumu_ecm240':             {'fraction':fraction},
     'p8_ee_ZZ_ecm240':                  {'fraction':fraction},
-    'wz3p6_ee_tautau_ecm240':           {'fraction':fraction},
-    'wz3p6_ee_mumu_ecm240':             {'fraction':fraction},
+    'wzp6_ee_tautau_ecm240':            {'fraction':fraction},
+    'wzp6_ee_mumu_ecm240':              {'fraction':fraction},
 
     'wzp6_ee_mumuH_Hbb_ecm240':         {'fraction':1},
     'wzp6_ee_mumuH_Hcc_ecm240':         {'fraction':1},
@@ -27,19 +27,17 @@ processList = {
     'wzp6_ee_mumuH_HZZ_ecm240':         {'fraction':1},
     'wzp6_ee_mumuH_Hmumu_ecm240':       {'fraction':1},
     'wzp6_ee_mumuH_Htautau_ecm240':     {'fraction':1},
-    'wz3p6_ee_mumuH_Hinv_ecm240':       {'fraction':1},
-
 }
 
 
 
-## MIT
-inputDir = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
-procDict = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/samplesDict.json"
 
-## CERN
-#prodTag     = "FCCee/winter2023/IDEA/"
-#procDict = "FCCee_procDict_winter2023_IDEA.json"
+if "mit.edu" in socket.gethostname(): # configuration for MIT
+    inputDir = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/"
+    procDict = "/ceph/submit/data/group/fcc/ee/generation/DelphesEvents/winter2023/IDEA/samplesDict.json"
+else: # default configuration for CERN
+    prodTag     = "FCCee/winter2023/IDEA/"
+    procDict = "FCCee_procDict_winter2023_IDEA.json"
 
 # additional/custom C++ functions
 includePaths = ["utils.h"]
@@ -72,9 +70,12 @@ bins_charge = (10, -5, 5)
 ## load modules and files for jet clustering and flavor tagging
 ################################################################################
 
-# files from /eos/experiment/fcc/ee/jet_flavour_tagging/winter2023/wc_pt_7classes_12_04_2023
-weaver_preproc = "fccee_flavtagging_edm4hep_wc.json"
-weaver_model = "fccee_flavtagging_edm4hep_wc.onnx"
+if "mit.edu" in socket.gethostname(): # configuration for MIT
+    weaver_preproc = "/ceph/submit/data/group/fcc/ee/aux/tagger/fccee_flavtagging_edm4hep_wc.json"
+    weaver_model = "/ceph/submit/data/group/fcc/ee/aux/tagger/fccee_flavtagging_edm4hep_wc.onnx"
+else: # default configuration for CERN
+    weaver_preproc = "/eos/experiment/fcc/ee/jet_flavour_tagging/winter2023/wc_pt_7classes_12_04_2023fccee_flavtagging_edm4hep_wc.json"
+    weaver_model = "/eos/experiment/fcc/ee/jet_flavour_tagging/winter2023/wc_pt_7classes_12_04_2023fccee_flavtagging_edm4hep_wc.onnx"
 
 from addons.ONNXRuntime.jetFlavourHelper import JetFlavourHelper
 from addons.FastJet.jetClusteringHelper import ExclusiveJetClusteringHelper
@@ -205,7 +206,6 @@ def build_graph(df, dataset):
 
 
 
-    
 
     # Now we go for jet clustering
     # we want to look for 2 jets in our event, but first we need to remove the muons
@@ -252,9 +252,8 @@ def build_graph(df, dataset):
     hists.append(df.Histo1D(("dijet_m", "", *bins_m), "dijet_m"))
 
     # cut on the b-jet score
+    df = df.Filter("recojet_isB[0] > 0.5 && recojet_isB[1] > 0.5")
     hists.append(df.Histo1D(("cutFlow", "", *bins_count), "cut6"))
-    df = df.Filter("recojet_isB[0] > 0.5 && recojet_isB[0] > 0.5")
-
 
     hists.append(df.Histo1D(("zmumu_recoil_m_final", "", *(40, 120, 140)), "zmumu_recoil_m"))
 
