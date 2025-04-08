@@ -9,7 +9,7 @@ from addons.TMVAHelper.TMVAHelper import TMVAHelperXGB
 
 
 # this number is used to run only on a fraction of the Monte Carlo samples, which can speed up the analysis
-fraction = 1
+fraction = 0.02
 
 processList = {
     'p8_ee_WW_mumu_ecm240':             {'fraction':fraction},
@@ -17,16 +17,16 @@ processList = {
     'wzp6_ee_tautau_ecm240':            {'fraction':fraction},
     'wzp6_ee_mumu_ecm240':              {'fraction':fraction},
 
-    'wzp6_ee_mumuH_Hbb_ecm240':         {'fraction':1},
-    'wzp6_ee_mumuH_Hcc_ecm240':         {'fraction':1},
-    'wzp6_ee_mumuH_Hss_ecm240':         {'fraction':1},
-    'wzp6_ee_mumuH_Hgg_ecm240':         {'fraction':1},
-    'wzp6_ee_mumuH_Haa_ecm240':         {'fraction':1},
-    'wzp6_ee_mumuH_HZa_ecm240':         {'fraction':1},
-    'wzp6_ee_mumuH_HWW_ecm240':         {'fraction':1},
-    'wzp6_ee_mumuH_HZZ_ecm240':         {'fraction':1},
-    'wzp6_ee_mumuH_Hmumu_ecm240':       {'fraction':1},
-    'wzp6_ee_mumuH_Htautau_ecm240':     {'fraction':1},
+    'wzp6_ee_mumuH_Hbb_ecm240':         {'fraction':fraction},
+    'wzp6_ee_mumuH_Hcc_ecm240':         {'fraction':fraction},
+    'wzp6_ee_mumuH_Hss_ecm240':         {'fraction':fraction},
+    'wzp6_ee_mumuH_Hgg_ecm240':         {'fraction':fraction},
+    'wzp6_ee_mumuH_Haa_ecm240':         {'fraction':fraction},
+    'wzp6_ee_mumuH_HZa_ecm240':         {'fraction':fraction},
+    'wzp6_ee_mumuH_HWW_ecm240':         {'fraction':fraction},
+    'wzp6_ee_mumuH_HZZ_ecm240':         {'fraction':fraction},
+    'wzp6_ee_mumuH_Hmumu_ecm240':       {'fraction':fraction},
+    'wzp6_ee_mumuH_Htautau_ecm240':     {'fraction':fraction},
 }
 
 
@@ -47,7 +47,7 @@ includePaths = ["utils.h"]
 outputDir   = "output/ZmumuHbb/histmaker/"
 
 # optional: ncpus, default is 4, -1 uses all cores available
-nCPUS       = -1
+nCPUS       = 8
 
 
 # scale the histograms with the cross-section and integrated luminosity
@@ -74,8 +74,8 @@ if "mit.edu" in socket.gethostname(): # configuration for MIT
     weaver_preproc = "/ceph/submit/data/group/fcc/ee/aux/tagger/fccee_flavtagging_edm4hep_wc.json"
     weaver_model = "/ceph/submit/data/group/fcc/ee/aux/tagger/fccee_flavtagging_edm4hep_wc.onnx"
 else: # default configuration for CERN
-    weaver_preproc = "/eos/experiment/fcc/ee/jet_flavour_tagging/winter2023/wc_pt_7classes_12_04_2023fccee_flavtagging_edm4hep_wc.json"
-    weaver_model = "/eos/experiment/fcc/ee/jet_flavour_tagging/winter2023/wc_pt_7classes_12_04_2023fccee_flavtagging_edm4hep_wc.onnx"
+    weaver_preproc = "/eos/experiment/fcc/ee/jet_flavour_tagging/winter2023/wc_pt_7classes_12_04_2023/fccee_flavtagging_edm4hep_wc.json"
+    weaver_model = "/eos/experiment/fcc/ee/jet_flavour_tagging/winter2023/wc_pt_7classes_12_04_2023/fccee_flavtagging_edm4hep_wc.onnx"
 
 from addons.ONNXRuntime.jetFlavourHelper import JetFlavourHelper
 from addons.FastJet.jetClusteringHelper import ExclusiveJetClusteringHelper

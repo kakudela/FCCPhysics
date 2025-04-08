@@ -118,7 +118,7 @@ Normalization can be automated during the analysis. To enable this, modify the f
     doScale = True
     intLumi = 10.8e6  # Integrated luminosity at the Higgs threshold (10.8 ab-1)
 
-After running the script, a ROOT file is created for each process in the output directory (`output/ZmumuH/histmaker/`). These files contain all the histograms needed for the next steps of the analysis. If you run into issues executing the setup or want to skip the processing step, we’ve pre-generated the files with full statistics. You can access them here:
+After running the script (which typically takes about 5 minutes depending on the load of the machine you're on), a ROOT file is created for each process in the output directory (`output/ZmumuH/histmaker/`). These files contain all the histograms needed for the next steps of the analysis. If you run into issues executing the setup or want to skip the processing step, we’ve pre-generated the files with full statistics. You can access them here:
 
 	/ceph/submit/data/group/fcc/ee/tutorials/FNAL2025/ZmumuH/histmaker/ # MIT
 	/eos/project/f/fccsw-web/www/tutorials/FNAL2025/ZmumuH/histmaker/ # CERN
@@ -311,12 +311,12 @@ Execute the full analysis pipeline:
 
 Make sure to adapt the input/output directory in the scripts if needed. 
 
-As you will notice, the first command might take a while to run — this is because the tagger inference step is relatively slow. If you don't want to wait for its output, or if you run into issues executing the setup, you can skip this step entirely. We’ve pre-generated the files with full statistics, and you can access them here:
+As you will notice, the first command might take a while to run — this is because the tagger inference step is relatively slow. Normally we parallelize this step and submit it to a batch system, which is outside of the scope of this tutorial. We’ve pre-generated the files with full statistics, and you can access them here:
 
 	/ceph/submit/data/group/fcc/ee/tutorials/FNAL2025/ZmumuHbb/histmaker/ # MIT
 	/eos/project/f/fccsw-web/www/tutorials/FNAL2025/ZmumuHbb/histmaker/ # CERN
 
-If you use these samples, make sure to update the input directory in the plotting and combine scripts.
+If you use these samples, make sure to update the input directory in the plotting and combine scripts (or you can copy them to the input directory `output/ZmumuHbb/histmaker`).
 
 
 After running the full chain:
@@ -324,7 +324,7 @@ After running the full chain:
 - How much does the significance improve after applying the b-tagging probability cut?
 - How does the fit result (uncertainty on the H → bb̄ cross section) compare to the previous result without tagging?
 - Is it closer to the expected statistical limit?
-- Is the background from non-bb Higgs decays better suppressed? What about the backgrounds, in particular WW?
+- Is the background from non-bb Higgs decays better suppressed? What about the backgrounds, in particular WW and Z/γ*?
 
 Use these comparisons to understand how flavor tagging enhances the precision of the measurement.
 
