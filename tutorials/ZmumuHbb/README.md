@@ -1,11 +1,12 @@
 
-# Analyzing events for FCC-ee
-In this tutorial, we're going to analyze events from the FCC-ee and measure cross-sections for selected processes. Throughout the tutorial, you'll learn how to perform a basic analysis, fit histograms, apply jet clustering and flavor tagging, and use machine learning techniques:
 
-- **Part I:** Basic analysis and event selection, plotting, and cross-section measurement  
-- **Part II:** Fitting of histograms  
-- **Part III:** Jet clustering and flavor tagging  
-- **Part IV:** Machine learning using Boosted Decision Trees
+
+# Analyzing events for FCC-ee
+In this tutorial, we're going to analyze events from the FCC-ee and measure cross-sections for selected processes. Throughout the tutorial, you'll learn how to perform a basic analysis, fit histograms, apply jet clustering and flavor tagging:
+
+- **Part I:** Basic analysis and event selection, plotting, and cross-section measurement
+- **Part II:** Fitting of histograms
+- **Part III:** Jet clustering and flavor tagging
 
 
 
@@ -15,18 +16,24 @@ In this tutorial, we're going to analyze events from the FCC-ee and measure cros
 
 Instructions for account creation, logging in into the SubMIT cluster can be found [here](https://github.com/jeyserma/FCCPhysics/blob/main/tutorials/ZmumuHbb/SUBMIT.md).
 
+An introduction to Linux and Git can be found [here](https://github.com/jeyserma/FCCPhysics/blob/main/tutorials/ZmumuHbb/LINUX.md).
+
+#### Basic analysis tools (optional)
+
+The following pages are not strictly required to complete the tutorial, but they provide helpful background on how analyses are typically performed in high energy physics. They cover useful tools, concepts, and workflows such as looping over events, making histograms, and plotting results.
+
+- [Basics of High Energy Physics Computing and Analysis](https://github.com/jeyserma/FCCPhysics/blob/main/tutorials/ZmumuHbb/BASICS.md)
+- [ROOT DataFrames](https://github.com/jeyserma/FCCPhysics/blob/main/tutorials/ZmumuHbb/RDATAFRAMES.md): ROOT’s high-level interface for processing events efficiently and in parallel across many files
+
+
 
 
 #### FCCAnalysis framework
-We will be working with the FCCAnalyses framework, available on [GitHub](https://github.com/HEP-FCC/FCCAnalyses). This is a common analysis framework developed for FCC-related studies. It lets you run full analyses over existing simulated samples, apply event selections, and produce plots and histograms. The input samples used in this tutorial are available [here](https://fcc-physics-events.web.cern.ch/fcc-ee/delphes/winter2023/idea/).
-
+We will be working with the FCCAnalyses framework, available on [GitHub](https://github.com/HEP-FCC/FCCAnalyses). This is a common analysis framework developed for FCC-related studies, based on ROOT Dataframes. It lets you run full analyses over existing simulated samples, apply event selections, and produce plots and histograms. 
 
 If you are running the tutorial on the MIT computing infrastructure, there is a pre-installed version of the analysis software available. You can set it up by running (this command must be executed every time you log into a new terminal session):
 
     source /work/submit/jaeyserm/software/FCCAnalyses/setup.sh
-
-
-
 
 
 If you're running at CERN or prefer to install the analysis framework yourself, follow the instructions below (adapted from the [FCCAnalyses GitHub repository](https://github.com/HEP-FCC/FCCAnalyses)):
@@ -45,6 +52,20 @@ For subsequent sessions, simply run:
     cd go/to/my/directory/FCCAnalyses
     source setup.sh
 
+
+
+
+
+#### Event samples 
+
+For each physics process—such as signal, background, and specific Higgs decays—a sufficient number of events has been generated and is shared across all FCC analyses. These events are produced using various event generators (e.g., *Pythia*, *Whizard*) and processed with the [*Delphes* fast simulation framework](https://arxiv.org/abs/1307.6346) for detector simulation and reconstruction. The resulting events are stored as ROOT files in the [*edm4hep* data format](https://github.com/key4hep/EDM4hep), which is part of the [Key4HEP](https://key4hep.github.io/) software stack for future collider studies.
+
+All samples in this tutorial are simulated using the [IDEA detector concept](https://arxiv.org/abs/2005.00022), which serves as the reference detector for FCC-ee physics studies.
+
+You can find the full list of available samples [here](https://fcc-physics-events.web.cern.ch/fcc-ee/delphes/winter2023/idea/). 
+
+In this tutorial, we will work with a selected subset of these samples, as described in a later section.
+
 ####  Getting the Tutorial Files
 
 We’ve prepared a few Python files to guide you through this tutorial. You can find them in a separate repository  
@@ -54,9 +75,6 @@ You can either download the files individually from the repository or clone the 
 
     git clone https://github.com/jeyserma/FCCPhysics.git
     cd FCCPhysics/tutorials/ZmumuHbb
-
-
-
 
 #### CMS Combination Tool (Combine)
 We'll use the CMS Combination Tool for performing the statistical fits. This tool is built on top of the RooFit framework and is widely used within CMS for signal extraction, limit setting, and uncertainty estimation.
@@ -93,30 +111,39 @@ We aim to extract the total Higgs production cross-section using the recoil meth
 Finally, we construct a recoil mass histogram, which is used as input to the [CMS Combine tool](https://cms-analysis.github.io/HiggsAnalysis-CombinedLimit/) to estimate the uncertainty on the cross-section via a binned maximum likelihood fit.
 
 
-### Step 1: Running the Event Selection and Producing Histograms
+### Step 1: Running the Event Selection
 
-To generate the event selection and histograms for all signal and background samples (which are pre-generated using the FastSim IDEA detector), run the following script from the main `FCCAnalyses` directory:
+To generate the event selection and histograms for all signal and background samples (see below), run the following script from the main `FCCAnalyses` directory:
 
 	fccanalysis run analysis_ZmumuH.py
 
-You can inspect this file to see the cuts that have been applied. The processes that are included in during the analysis are specified in the processList dictionary:
+The script typically takes a few minutes to run. It includes a main function, `build_graph(df, dataset)`, which is responsible for constructing the analysis graph. The `dataset` argument is a string that identifies the current dataset or process (see below for the list of processes used). The `df` argument is a dataframe object that you can modify within the function by applying selection cuts using `df.Filter()` or defining new variables on top of the existing ones using `df.Define()`. Histograms can be created with `df.Histo1D()` and should be added to the `hists` list. This list must be returned by the `build_graph()` function for the analysis to proceed correctly.
 
+> *Exercise:* Inspect the `build_graph()` in the `analysis_ZmumuH.py` file. How many cuts are applied? What do they represent?
+
+The processes that are included in during the analysis are specified in the processList dictionary:
+
+    fraction = 0.2
     processList = {
-        'wzp6_ee_mumuH_HXX_ecm240':      {'fraction': 1},
-        'p8_ee_ZZ_ecm240':               {'fraction': 1},
-        'p8_ee_WW_mumu_ecm240':          {'fraction': 1},
-        'wzp6_ee_mumu_ecm240':           {'fraction': 1},
+        'wzp6_ee_mumuH_HXX_ecm240':      {'fraction': 1}, # signal
+        'p8_ee_ZZ_ecm240':               {'fraction': fraction}, # background
+        'p8_ee_WW_mumu_ecm240':          {'fraction': fraction}, # background
+        'wzp6_ee_mumu_ecm240':           {'fraction': fraction}, # background
     }
 
-For the Higgs signal sample `wzp6_ee_mumuH_HXX_ecm240`, we have several samples available for each individual Higgs decay .
+Each process should be generated beforehand centrally (see section above for the Event Samples). For the Higgs signal sample `wzp6_ee_mumuH_HXX_ecm240`, we have several samples available for each individual Higgs decay.
 
-If you'd like to test the functionality of the script without processing the full datasets, you can reduce the number of events by adjusting the `fraction` values in `zh_xsec.py`. A fraction of `1` means all events are processed. You can reduce this value (e.g., to `0.1`) to speed up the creation of histograms for testing purposes.
+The `fraction` parameter represents the fraction of the events you would like to run on. If you'd like to test the functionality of the script without processing the full datasets, you can reduce the number of events by adjusting the `fraction` values per process. A fraction of `1` means all events are processed. You can reduce this value (e.g., to `0.1`) to speed up the creation of histograms for testing purposes. By default, we run over the full signal statistics, but only 20% of the background statistics. With this configuration, in total you run over 100 million of events in just a few minutes!
 
 
-Normalization can be automated during the analysis. To enable this, modify the following parameters in `z_mumu_xsec.py`:
+Normalization of the histograms to a given integrated luminosity can be automated during the analysis. To enable this, modify the following parameters in `analysis_ZmumuH.py`:
 
     doScale = True
     intLumi = 10.8e6  # Integrated luminosity at the Higgs threshold (10.8 ab-1)
+
+The cross-sections for each process are automatically taken into account in the background (the cross-sections are stored as meta information per sample).
+
+The FCCAnalysis framework provides built-in functions—such as `FCCAnalyses::ReconstructedParticle::get_p()`—to access particles and their properties in the event samples, along with utilities for computing important observables in electron-positron collider physics. You can also define your own analysis-specific functions in C++, place them in a header file, and include them in your analysis script using the `includePaths` option, for example: `includePaths = ["utils.h"]`. This option accepts a list of header files that contain your custom functions and code snippets. In this tutorial, we use a `utils.h` file that defines several helper functions to compute the missing energy vector, its polar angle, and the acolinearity. Take a look at the contents of this file to understand how these quantities are calculated.
 
 After running the script (which typically takes about 5 minutes depending on the load of the machine you're on), a ROOT file is created for each process in the output directory (`output/ZmumuH/histmaker/`). These files contain all the histograms needed for the next steps of the analysis. If you run into issues executing the setup or want to skip the processing step, we’ve pre-generated the files with full statistics. You can access them here:
 
@@ -127,11 +154,14 @@ After running the script (which typically takes about 5 minutes depending on the
 
 
 ### Step 2: Plotting Histograms
+The FCCAnalysis framework provides a built-in plotting tool that you can use to visualize histograms.  
+However, you are not limited to this tool—other plotting libraries such as `matplotlib` can also be used, especially for more customized or publication-ready plots (see the *Basic Analysis Tools* section for details).
+
 To visualize the histograms and the cutflow plot, run the following command:
 
     fccanalysis plots plots_ZmumuH.py
 
-Make sure to specify the input and output directories inside the `plots.py` script (e.g. if you want to plot and run the pre-generated files as explained above, you should point to that directory).
+Make sure to specify the input (by default `output/ZmumuH/histmaker/`) and output directories inside the `plots_ZmumuH.py` script (e.g. if you want to plot and run the pre-generated files as explained above, you should point to that directory).
 
 The cutflow plot provides a clear illustration of how background events are progressively reduced by each selection cut, while ideally retaining the signal. To quantify the efficiency of this selection, we calculate the significance:
 
@@ -155,9 +185,12 @@ Maximizing the significance and mimnimizing the uncertainty is a key goal in any
 
 The significance after each cut has already been calculated for you and is listed in the file `cutFlow.txt`. Do you observe a final significance of 120? What is the corresponding uncertainty on the signal process?
 
-Now try tightening the recoil mass cut to see if you can further improve the significance. How much more can you squeeze out of it?
+> *Exercise:*  In the `build_graph` function, the **acolinearity** is computed between the two selected muons. Acolinearity measures how far the muons deviate from being perfectly back-to-back, which is characteristic of signal events from the **Z/γ\*** process.
+> Update the plotting script to include this variable and produce a histogram of the acolinearity distribution.
+> You can also explore whether applying a selection cut (a filter) on this variable helps suppress background events while retaining most of the signal. Try different cut values and compare the resulting distributions to evaluate the effectiveness of such a cut.
 
-
+> *Exercise:*  In the `build_graph` function, the **missing energy** vector (`missingEnergy`) is defined and used to compute the **cosine of the polar angle** of the missing energy.  You can use this vector to calculate the **missing momentum** (i.e., its magnitude) with the built-in function `FCCAnalyses::ReconstructedParticle::get_p()` as we use for the muons, create a histogram, and add it to the plotting script.
+> Once plotted, analyze the distribution of the missing momentum. Consider whether applying a cut on this variable can help suppress specific background processes. Which background can be effectively reduced by such a cut, and why? 
 
 
 # Part II: Statistical Analysis
@@ -205,16 +238,10 @@ From this output, you can extract:
 - The best-fit value of `r` (signal strength), which is `1.0`
 - The uncertainty on `r`, which is approximately `±0.006`, or 0.6%
 
-
-How Does This Compare to the Significance?
-- The **significance** gives a measure of how likely it is that the observed signal stands out from the background — useful for discovery.
-- The **likelihood fit** provides the uncertainty on the signal strength, which is key for precision measurements.
-
-Is 0.6% uncertainty better or worse than what you got from the cut-based significance? Why?
-Think about:
-- Whether combining bins gives you more statistical power  
-- How much information you lost by applying a single tight cut  
-- The advantages of fitting a shape vs. counting events
+> *Exercise:*  How does 0.6% uncertainty compares to the uncertainty from the significance? Is it better or worse? Think about:
+> - Whether combining bins gives you more statistical power  
+> - How much information you lost by applying a single tight cut  
+> - The advantages of fitting a shape vs. counting events
 
 
 
@@ -232,7 +259,7 @@ Think about:
 ## Extract the uncertainty for H → bb̄ 
 The Higgs boson predominantly decays to a pair of b-quarks, with a branching ratio of approximately 58%. One of the key objectives of FCC-ee is to precisely measure the cross section for H → bb̄, which directly relates to the Higgs coupling to b-quarks.
 
-So far, we have considered all Higgs decay modes (H → bb̄, cc̄, τ⁺τ⁻, WW, ZZ, etc.) as signal. To focus specifically on H → bb̄, we must redefine the signal and background processes in the Combine setup:
+So far, we have considered all Higgs decay modes (H → bb̄, cc̄, τ⁺τ⁻, WW, ZZ, etc.) as signal. To focus and measure specifically on H → bb̄, we must redefine the signal and background processes in the `combine_ZmumuH.py`
 
     sig_procs = {'sig': ['wzp6_ee_mumuH_Hbb_ecm240']}
     bkg_procs = {
@@ -318,15 +345,13 @@ As you will notice, the first command might take a while to run — this is beca
 
 If you use these samples, make sure to update the input directory in the plotting and combine scripts (or you can copy them to the input directory `output/ZmumuHbb/histmaker`).
 
-
-After running the full chain:
-
-- How much does the significance improve after applying the b-tagging probability cut?
-- How does the fit result (uncertainty on the H → bb̄ cross section) compare to the previous result without tagging?
-- Is it closer to the expected statistical limit?
-- Is the background from non-bb Higgs decays better suppressed? What about the backgrounds, in particular WW and Z/γ*?
-
-Use these comparisons to understand how flavor tagging enhances the precision of the measurement.
+> *Exercise:*  After running the full chain:
+>- How much does the significance improve after applying the b-tagging probability cut?
+>- How does the fit result (uncertainty on the H → bb̄ cross section) compare to the previous result without tagging?
+>- Is it closer to the expected statistical limit?
+>- Is the background from non-bb Higgs decays better suppressed? What about the backgrounds, in particular WW and Z/γ*?
+>
+> Use these comparisons to understand how flavor tagging enhances the precision of the measurement.
 
 
 
@@ -335,22 +360,6 @@ Use these comparisons to understand how flavor tagging enhances the precision of
 
 
 
-# Part IV: Boosted Descision Tree (in progress)
-
-Instread of cut and counting, we will use Machine Learning techniques to improve our result. We need to prepare variables tthat distinguish between signal and background. Candidates are:
-
-- Recoil mass
-- Higgs mass
-- Jet kinematics
-- Flavor information of the jets
 
 
-### Preparing the input variables
 
-### Run the Training and Evaluation
-
-### Apply the inference
-
-### Evaluate the performance
-
-Evaluate the performance by fitting on the MVA discriminator. How does it does the result change w.r.t. the previous result?

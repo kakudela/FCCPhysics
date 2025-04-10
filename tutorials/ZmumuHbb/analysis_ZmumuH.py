@@ -64,6 +64,7 @@ bins_phi = (400, -4, 4)
 
 bins_count = (50, 0, 50)
 bins_charge = (10, -5, 5)
+bins_aco = (500, 0, 5)
 
 
 def build_graph(df, dataset):
@@ -130,6 +131,12 @@ def build_graph(df, dataset):
     df = df.Filter("muons_no == 2 && Sum(muons_q) == 0")
     hists.append(df.Histo1D(("cutFlow", "", *bins_count), "cut1"))
 
+    df = df.Define("leading_muon_p", "muons_p[0]")
+    df = df.Define("leading_muon_theta", "muons_theta[0]")
+    df = df.Define("subleading_muon_p", "muons_p[0]")
+    df = df.Define("subleading_muon_theta", "muons_theta[0]")
+    df = df.Define("acolinearity", "FCCAnalyses::acolinearity(muons)")
+
     # Construct the Lorentz vectors of the muons
     df = df.Define("muons_tlv", "FCCAnalyses::ReconstructedParticle::get_tlv(muons)")
     df = df.Define("muon1_tlv", "muons_tlv[0]")
@@ -187,5 +194,6 @@ def build_graph(df, dataset):
 
     hists.append(df.Histo1D(("zmumu_recoil_m_final", "", *(40, 120, 140)), "zmumu_recoil_m")) # this histogram we'll use for fitting
 
+    hists.append(df.Histo1D(("acolinearity", "", *bins_aco), "acolinearity"))
 
     return hists, weightsum

@@ -33,6 +33,20 @@ float get_cosTheta_miss(Vec_rp met){
     return costheta;
 }
 
+// acolinearity between two reco particles
+float acolinearity(Vec_rp in) {
+    if(in.size() < 2) return -999;
+
+    TLorentzVector p1;
+    p1.SetXYZM(in[0].momentum.x, in[0].momentum.y, in[0].momentum.z, in[0].mass);
+
+    TLorentzVector p2;
+    p2.SetXYZM(in[1].momentum.x, in[1].momentum.y, in[1].momentum.z, in[1].mass);
+
+    TVector3 v1 = p1.Vect();
+    TVector3 v2 = p2.Vect();
+    return std::acos(v1.Dot(v2)/(v1.Mag()*v2.Mag())*(-1.));
+}
 
 
 
