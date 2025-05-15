@@ -1,6 +1,11 @@
 # Detector Studies using DELPHES
 This repository contains a basic setup to generate local Delphes events given a physics process with Pythia, and analyze the output to extract the detector performance.
 
+Environment:
+
+	source /work/submit/jaeyserm/software/FCCAnalyses/setup.sh
+
+
 #### Generate events
 
 To generate events we need:
