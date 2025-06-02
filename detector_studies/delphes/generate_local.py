@@ -21,7 +21,9 @@ args = parser.parse_args()
 
 def main():
 
-    STACK = "/cvmfs/sw.hsf.org/spackages6/key4hep-stack/2022-12-23/x86_64-centos7-gcc11.2.0-opt/ll3gi/setup.sh"
+    STACK = "/cvmfs/sw.hsf.org/spackages7/key4hep-stack/2023-04-08/x86_64-centos7-gcc11.2.0-opt/urwcv/setup.sh"
+    #STACK = "/cvmfs/sw.hsf.org/spackages6/key4hep-stack/2022-12-23/x86_64-centos7-gcc11.2.0-opt/ll3gi/setup.sh"
+    STACK = "/cvmfs/sw.hsf.org/key4hep/setup.sh -r 2023-11-23"
 
     gen_card = args.gen_card
     delphes_card = args.delphes_card

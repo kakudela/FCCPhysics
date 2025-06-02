@@ -105,7 +105,8 @@ def compute_res(input_file, hist_name, output_name, plotGauss=True):
 if __name__ == "__main__":
 
     input_file, output_name = "output/IDEA_2T_Zmumu_ecm240.root", "resolution_IDEA_2T_Zmumu_ecm240"
-    input_file, output_name = "output/CLD_2T_Zmumu_ecm240.root", "resolution_CLD_2T_Zmumu_ecm240"
+    input_file, output_name = "output/IDEA_3T_Zmumu_ecm240.root", "resolution_IDEA_3T_Zmumu_ecm240"
+    #input_file, output_name = "output/CLD_2T_Zmumu_ecm240.root", "resolution_CLD_2T_Zmumu_ecm240"
     hist_name = "muons_res_p"
 
 

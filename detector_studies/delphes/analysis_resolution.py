@@ -31,12 +31,11 @@ def analysis(input_files, output_file):
 
     df = ROOT.RDataFrame("events", input_files)
 
-    df = df.Alias("Particle0", "Particle#0.index")
-    df = df.Alias("Particle1", "Particle#1.index")
-    df = df.Alias("MCRecoAssociations0", "MCRecoAssociations#0.index")
-    df = df.Alias("MCRecoAssociations1", "MCRecoAssociations#1.index")
+    df = df.Alias("MCRecoAssociations0", "_MCRecoAssociations_rec.index")
+    df = df.Alias("MCRecoAssociations1", "_MCRecoAssociations_sim.index")
 
-    df = df.Alias("Muons", "Muon#0.index")
+    df = df.Alias("Muons", "Muon_objIdx.index")
+
     df = df.Define("muons_all", "FCCAnalyses::ReconstructedParticle::get(Muons, ReconstructedParticles)")
     df = df.Define("muons_p", "FCCAnalyses::ReconstructedParticle::get_p(muons_all)")
 
@@ -59,7 +58,8 @@ def analysis(input_files, output_file):
 if __name__ == "__main__":
 
     input_files, output_file = ["samples/IDEA_2T_Zmumu_ecm240.root"], "output/IDEA_2T_Zmumu_ecm240.root"
-    input_files, output_file = ["samples/CLD_2T_Zmumu_ecm240.root"], "output/CLD_2T_Zmumu_ecm240.root"
+    input_files, output_file = ["samples/IDEA_3T_Zmumu_ecm240.root"], "output/IDEA_3T_Zmumu_ecm240.root"
+    #input_files, output_file = ["samples/CLD_2T_Zmumu_ecm240.root"], "output/CLD_2T_Zmumu_ecm240.root"
 
     logger.info(f"Start analysis")
     analysis(input_files, output_file)
