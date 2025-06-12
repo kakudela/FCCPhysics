@@ -21,6 +21,7 @@ parser.add_argument("--condor_priority", type=str, help="Condor priority", defau
 parser.add_argument("--storagedir", type=str, help="Base directory to save the samples", default="/ceph/submit/data/group/fcc/ee/detector/ddsim/")
 parser.add_argument("--global_pool", action="store_true", help="Submit to global pool")
 parser.add_argument("--osg_pool", action="store_true", help="Submit to OSG pool (Open Science Grid)")
+parser.add_argument("--maxEvents", help="Maximum number of events", type=int, default=9e99)
 args = parser.parse_args()
 
 # /cvmfs/sw.hsf.org/key4hep/releases/2024-03-10/x86_64-almalinux9-gcc11.3.1-opt/k4geo/0.20-hapqru/share/k4geo/FCCee/CLD/compact/CLD_o2_v05/
@@ -28,7 +29,7 @@ args = parser.parse_args()
 
 # python submit.py --gp_dir /ceph/submit/data/group/fcc/ee/detector/guineapig/FCCee_Z_4IP_04may23_FCCee_Z128/ --geometry_dir $K4GEO/FCCee/CLD/compact/CLD_o2_v05/
 
-# python submit.py --gp_dir /ceph/submit/data/group/fcc/ee/detector/guineapig/FCCee_Z_4IP_04may23_FCCee_Z128/ --geometry_file $K4GEO/FCCee/CLD/compact/CLD_o2_v05/CLD_o2_v05.xml --global_pool
+# python submit.py --gp_dir /ceph/submit/data/group/fcc/ee/detector/guineapig/FCCee_Z_4IP_04may23_FCCee_Z128/ --geometry_file $K4GEO/FCCee/CLD/compact/CLD_o2_v05/CLD_o2_v05.xml --maxEvents 10 --global_pool
 
 GP_STACK = "/cvmfs/sw.hsf.org/key4hep/setup.sh -r 2024-03-10"
 SINGULARITY = "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/key4hep/k4-deploy/alma9\:latest"
@@ -77,7 +78,7 @@ class DDSimProducer:
         for n, f in enumerate(input_files):
             seed = os.path.basename(f).replace("output_", "").replace(".pairs", "")
             seeds.append(seed)
-            if n > 10:
+            if n > args.maxEvents:
                 break
 
         # preparing submission dirs
