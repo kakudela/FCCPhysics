@@ -127,7 +127,7 @@ class DDSimProducer:
         
         
         ## key4hep images
-        #fOut.write(f'singularity exec {SINGULARITY} bash -c "source {GP_STACK} && ls -lrt /cvmfs && ls -lrt && export seed=$1 && ddsim --compactFile $K4GEO/FCCee/CLD/compact/CLD_o2_v05/CLD_o2_v05.xml --gun.particle \'mu+\' -N 10 --enableGun --outputFile output_$seed_sim.root"\n')
+        #fOut.write(f'singularity exec {SINGULARITY} bash -c "source {GP_STACK} && ls -lrt /cvmfs && ls -lrt && export seed=$1 && ddsim --compactFile $K4GEO/FCCee/CLD/compact/CLD_o2_v05/CLD_o2_v05.xml --gun.particle \'mu+\' -N 10 --enableGun --outputFile output_${{seed}}_sim.root"\n')
         #singularity exec --bind /work:/work /work/submit/jaeyserm/software/docker/cmssw_cc7.sif bash -c '
         
         
@@ -164,7 +164,7 @@ class DDSimProducer:
 
         fOut.write(f'on_exit_remove = (ExitBySignal == False) && (ExitCode == 0)\n')
         fOut.write(f'max_retries    = 3\n')
-        fOut.write(f'Memory         = {args.maxMemory}\n')
+        fOut.write(f'RequestMemory  = {args.maxMemory}\n')
         
         fOut.write(f'+JobFlavour    = "{self.condor_queue}"\n')
         fOut.write(f'Requirements          = ( BOSCOCluster =!= "t3serv008.mit.edu" && BOSCOCluster =!= "ce03.cmsaf.mit.edu" && BOSCOCluster =!= "eofe8.mit.edu")\n')
