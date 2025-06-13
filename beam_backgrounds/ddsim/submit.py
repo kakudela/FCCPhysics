@@ -16,7 +16,7 @@ parser.add_argument("-s", "--submit", action='store_true', help="Submit to batch
 parser.add_argument("--gun_file", type=str, help="Input gun file")
 parser.add_argument("--gp_dir", type=str, help="Input directory containing .pairs files from Guinea pig")
 parser.add_argument("--geometry_file", type=str, help="Geometry file", required=True)
-parser.add_argument("--condor_queue", type=str, help="Condor priority", choices=["espresso", "microcentury", "longlunch", "workday", "tomorrow", "testmatch", "nextweek"], default="longlunch")
+parser.add_argument("--condor_queue", type=str, help="Condor priority", choices=["espresso", "microcentury", "longlunch", "workday", "tomorrow", "testmatch", "nextweek"], default="espresso")
 parser.add_argument("--condor_priority", type=str, help="Condor priority", default="group_u_FCC.local_gen")
 parser.add_argument("--storagedir", type=str, help="Base directory to save the samples", default="/ceph/submit/data/group/fcc/ee/detector/ddsim/")
 parser.add_argument("--global_pool", action="store_true", help="Submit to global pool")
@@ -108,12 +108,18 @@ class DDSimProducer:
 
         #fOut.write(f"source {GP_STACK}\n")
         fOut.write(f"ls -lrt\n")
-        fOut.write(f"seed=$1\n")
+        fOut.write(f"export seed=$1\n")
 
         fOut.write(f"mkdir geometry\n")
         fOut.write(f"tar -xf geometry.tar -C geometry\n")
 
         fOut.write('echo "START DDSIM IN CONTAINER"\n')
+        fOut.write(f"ls -lrt /cvmfs\n")
+        fOut.write(f"source {GP_STACK}\n")
+        fOut.write(f"ls -lrt /cvmfs\n")
+        fOut.write(f"echo $seed\n")
+        #fOut.write(f'ddsim --compactFile $K4GEO/FCCee/CLD/compact/CLD_o2_v05/CLD_o2_v05.xml --gun.particle \'mu+\' -N 10 --enableGun --outputFile output_$seed_sim.root \n')
+        
 
         #fOut.write(f'cmssw-el9 -- "source {GP_STACK} && ls -lrt && export seed=$1 && ddsim --compactFile geometry/{self.geometry_name}.xml --outputFile output_$seed_sim.root --inputFiles output_$seed.pairs --numberOfEvents -1"\n')
         #fOut.write(f'singularity run  -- "source {GP_STACK} && ls -lrt && export seed=$1 && ddsim --compactFile $K4GEO/FCCee/CLD/compact/CLD_o2_v05/CLD_o2_v05.xml --gun.particle "mu+" -N 10 --enableGun --outputFile output_$seed_sim.root"\n')
@@ -126,12 +132,12 @@ class DDSimProducer:
         
         ## DIRECT (assuming running on ALMA9 or related)
         fOut.write(f"source {GP_STACK}\n")
-        fOut.write(f'ddsim --compactFile geometry/{self.geometry_name}.xml --outputFile output_$seed_sim.root --inputFiles output_$seed.pairs --numberOfEvents -1\n')
+        fOut.write(f'ddsim --compactFile geometry/{self.geometry_name}.xml --outputFile output_${{seed}}_sim.root --inputFiles output_$seed.pairs --numberOfEvents -1\n')
 
         fOut.write("echo \"DONE DDSIM\"\n")
         fOut.write("duration=$SECONDS\n")
         fOut.write("echo \"Duration: $(($duration))\"\n")
-        fOut.write(f"ls -lrt /cvmfs \n")
+        #fOut.write(f"ls -lrt /cvmfs \n")
         fOut.write(f"ls -lrt\n")
 
         subprocess.getstatusoutput(f"chmod 777 {submitFn}")
@@ -171,10 +177,16 @@ class DDSimProducer:
 
         # OSG pool
         elif args.osg_pool:
-            fOut.write(f'+SingularityImage       = "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/key4hep/k4-deploy/alma9\:latest"\n') ## does not work
+            # https://portal.osg-htc.org/documentation/htc_workloads/specific_resource/requirements/#additional-feature-specific-attributes
+            #fOut.write(f'+SingularityImage       = "/cvmfs/unpacked.cern.ch/gitlab-registry.cern.ch/key4hep/k4-deploy/alma9\:latest"\n') ## does not work
             fOut.write(f'+ProjectName            = "MIT_submit"\n')
-            fOut.write(f'Requirements          = ( BOSCOCluster =!= "t3serv008.mit.edu" && BOSCOCluster =!= "ce03.cmsaf.mit.edu" && BOSCOCluster =!= "eofe8.mit.edu" && OSGVO_OS_STRING == "RHEL 9" && HAS_SINGULARITY == TRUE)\n')
-
+            #fOut.write(f'Requirements          = ( BOSCOCluster =!= "t3serv008.mit.edu" && BOSCOCluster =!= "ce03.cmsaf.mit.edu" && BOSCOCluster =!= "eofe8.mit.edu" && OSGVO_OS_STRING == "RHEL 9" && HAS_SINGULARITY == TRUE )\n')
+            fOut.write(f'Requirements          = ( OSGVO_OS_STRING == "RHEL 9" && HAS_CVMFS_singularity_opensciencegrid_org == True )\n')
+            
+            ## HAS_oasis_opensciencegrid_org --> no resources
+            ## HAS_CVMFS_singularity_opensciencegrid_org 
+            ## && HAS_CVMFS_singularity_opensciencegrid_org == True
+            
 
         elif 'mit.edu' in HOSTNAME:
             fOut.write(f'+DESIRED_Sites = "mit_tier2,mit_tier3"\n')
