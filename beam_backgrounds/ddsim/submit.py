@@ -16,12 +16,13 @@ parser.add_argument("-s", "--submit", action='store_true', help="Submit to batch
 parser.add_argument("--gun_file", type=str, help="Input gun file")
 parser.add_argument("--gp_dir", type=str, help="Input directory containing .pairs files from Guinea pig")
 parser.add_argument("--geometry_file", type=str, help="Geometry file", required=True)
-parser.add_argument("--condor_queue", type=str, help="Condor priority", choices=["espresso", "microcentury", "longlunch", "workday", "tomorrow", "testmatch", "nextweek"], default="espresso")
+parser.add_argument("--condor_queue", type=str, help="Condor priority", choices=["espresso", "microcentury", "longlunch", "workday", "tomorrow", "testmatch", "nextweek"], default="longlunch")
 parser.add_argument("--condor_priority", type=str, help="Condor priority", default="group_u_FCC.local_gen")
 parser.add_argument("--storagedir", type=str, help="Base directory to save the samples", default="/ceph/submit/data/group/fcc/ee/detector/ddsim/")
 parser.add_argument("--global_pool", action="store_true", help="Submit to global pool")
 parser.add_argument("--osg_pool", action="store_true", help="Submit to OSG pool (Open Science Grid)")
 parser.add_argument("--maxEvents", help="Maximum number of events", type=int, default=9e99)
+parser.add_argument("--maxMemory", help="Maximum job memory", type=float, default=2000)
 args = parser.parse_args()
 
 # /cvmfs/sw.hsf.org/key4hep/releases/2024-03-10/x86_64-almalinux9-gcc11.3.1-opt/k4geo/0.20-hapqru/share/k4geo/FCCee/CLD/compact/CLD_o2_v05/
@@ -163,6 +164,8 @@ class DDSimProducer:
 
         fOut.write(f'on_exit_remove = (ExitBySignal == False) && (ExitCode == 0)\n')
         fOut.write(f'max_retries    = 3\n')
+        fOut.write(f'Memory         = {args.maxMemory}\n')
+        
         fOut.write(f'+JobFlavour    = "{self.condor_queue}"\n')
         fOut.write(f'Requirements          = ( BOSCOCluster =!= "t3serv008.mit.edu" && BOSCOCluster =!= "ce03.cmsaf.mit.edu" && BOSCOCluster =!= "eofe8.mit.edu")\n')
         
