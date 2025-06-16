@@ -15,7 +15,6 @@ Create an input file (`gun.input`):
     npart 1
     theta_range 90.0,90.0
     mom_range 20.0,80.0
-    drmax 0.001
     pid_list 13,-13
     nevents 100000
 
