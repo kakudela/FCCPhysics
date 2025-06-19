@@ -25,7 +25,7 @@ ROOT.gInterpreter.Declare('#include "functions.h"')
 
 
 bins_p = (250, 0, 250)
-bins_res = (10000, -0.1, 0.1)
+bins_res = (1000, -0.1, 0.1)
 
 def analysis(input_files, output_file):
 

@@ -25,7 +25,8 @@ ROOT.gInterpreter.Declare('#include "functions.h"')
 
 
 bins_p = (250, 0, 250)
-bins_res = (10000, -0.05, 0.05)
+bins_res_p = (10000, -0.05, 0.05)
+bins_res_k = (10000, -0.005, 0.005)
 
 def analysis(input_files, output_file):
 
@@ -42,15 +43,17 @@ def analysis(input_files, output_file):
     muons_p = df.Histo1D(("muons_p", "", *bins_p), "muons_p")
 
 
-    # get resolution = reco/gen momentum
+    # get resolutions
     df = df.Define("muons_res_p", "FCCAnalyses::leptonResolution(muons_all, MCRecoAssociations0, MCRecoAssociations1, ReconstructedParticles, Particle, 0)")
-    muons_res_p = df.Histo1D(("muons_res_p", "", *bins_res), "muons_res_p")
-
+    df = df.Define("muons_res_k", "FCCAnalyses::leptonResolution(muons_all, MCRecoAssociations0, MCRecoAssociations1, ReconstructedParticles, Particle, 3)")
+    muons_res_p = df.Histo1D(("muons_res_p", "", *bins_res_p), "muons_res_p")
+    muons_res_k = df.Histo1D(("muons_res_k", "", *bins_res_k), "muons_res_k")
 
 
     fout = ROOT.TFile(output_file, "RECREATE")
     muons_p.Write()
     muons_res_p.Write()
+    muons_res_k.Write()
     fout.Close()
 
 
@@ -58,7 +61,7 @@ def analysis(input_files, output_file):
 if __name__ == "__main__":
 
     input_files, output_file = ["samples/IDEA_2T_Zmumu_ecm240.root"], "output/IDEA_2T_Zmumu_ecm240.root"
-    input_files, output_file = ["samples/IDEA_3T_Zmumu_ecm240.root"], "output/IDEA_3T_Zmumu_ecm240.root"
+    #input_files, output_file = ["samples/IDEA_3T_Zmumu_ecm240.root"], "output/IDEA_3T_Zmumu_ecm240.root"
     #input_files, output_file = ["samples/CLD_2T_Zmumu_ecm240.root"], "output/CLD_2T_Zmumu_ecm240.root"
 
     logger.info(f"Start analysis")
