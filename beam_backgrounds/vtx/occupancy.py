@@ -1,77 +1,52 @@
-from podio import root_io
-import glob
-import pickle
-import argparse
-import functions
-import math
-import ROOT
+import ROOT, argparse, os, glob, logging
 ROOT.gROOT.SetBatch(True)
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--calculate', help="Calculate", action='store_true')
-parser.add_argument("--maxFiles", type=int, default=1e99, help="Maximum files to run over")
-args = parser.parse_args()
+"""
+This script processes occupancy data from ROOT files (multi_analysis.py), calculating maximum and average occupancy
+"""
 
+ap = argparse.ArgumentParser()
+ap.add_argument('--inputDir', default='output', help='directory that holds <tag>.root files from multi_analysis')
+ap.add_argument('--tags', nargs='+', default=None, help='dataset tags; if omitted, use every *.root in inputDir')
+ap.add_argument('--safety',  type=float, default=3, help='safety factor')
+ap.add_argument('--cluster', type=float, default=5, help='cluster size (pixels per module)')
+args = ap.parse_args()
 
-##########################################################################################
-#  this file is for calculating the average and max occupancies in the first layer
-##########################################################################################
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+log = logging.getLogger('occ')
 
-folder = "/ceph/submit/data/group/fcc/ee/detector/VTXStudiesFullSim/CLD_o2_v05/FCCee_Z_4IP_04may23_FCCee_Z/"
-files = glob.glob(f"{folder}/*.root")
+# find the root files we will inspect
+if args.tags:
+    files = [f"{args.inputDir}/{tag}.root" for tag in args.tags]
+else:
+    files = glob.glob(f"{args.inputDir}/*.root")
 
+if not files:
+    log.error('No ROOT files found – nothing to do.')
+    exit()
 
-# layer_radii = [14, 23, 34.5, 141, 316] # IDEA approximate layer radii
-# max_z = 96 # IDEA first layer
+for path in files:
+    tag = os.path.splitext(os.path.basename(path))[0]
+    f = ROOT.TFile(path)
+    if not f or f.IsZombie():
+        log.warning(f"skip {tag}: cannot open {path}")
+        continue
 
-layer_radii = [14, 36, 58] # CLD approximate layer radii
-max_z = 110 # CLD first layer
+    h = f.Get('cell_counts')
+    par = f.Get('nEvents')
+    if not h or not par:
+        log.warning(f"skip {tag}: required objects not found")
+        f.Close(); continue
 
+    nEv = par.GetVal()
+    vals = [h.GetBinContent(i)/nEv for i in range(1, h.GetNbinsX()+1)
+            if h.GetBinContent(i)]
+    if not vals:
+        log.warning(f"skip {tag}: empty occupancy histogram")
+        f.Close(); continue
 
-if args.calculate:
+    max_occ = max(vals) * args.safety * args.cluster
+    avg_occ = (sum(vals)/len(vals)) * args.safety * args.cluster
 
-    cellCounts = {}
-    nEvents = 0
-    for i,filename in enumerate(files):
-
-        print(f"starting {filename} {i}/{len(files)}")
-        podio_reader = root_io.Reader(filename)
-
-        events = podio_reader.get("events")
-        for event in events:
-            nEvents += 1
-            for hit in event.get("VertexBarrelCollection"):
-                radius_idx = functions.radius_idx(hit, layer_radii)
-                if radius_idx != 0: # consider only hits on the first layer
-                    continue
-
-                if hit.isProducedBySecondary(): # remove mc particle not tracked
-                    continue
-
-                # the cellID corresponds to a cluster of pixels = module
-                # the readout is done per module
-                cellID = hit.getCellID()
-                if not cellID in cellCounts:
-                    cellCounts[cellID] = 0
-                # increment the hit count for this module
-                # strictly speaking all the primaries+secondaries within the dR should be treated as 1 hit
-                cellCounts[cellID] += 1
-
-
-        if i > args.maxFiles:
-            break
-
-    # normalize the hits over the number of events
-    print(cellCounts)
-    cellCounts_norm = [cellCounts[c]/nEvents for c in cellCounts]
-    
-    max_hits = max(cellCounts_norm)
-    avg_hits = sum(cellCounts_norm)/len(cellCounts_norm)
-
-    safety_factor = 3
-    cluster_size = 5
-
-    # this corresponds to the occupancy per module
-    print(f"Maximum occupancy: {max_hits*safety_factor*cluster_size}")
-    print(f"Average occupancy: {avg_hits*safety_factor*cluster_size}")
-
+    print(f"{tag:>8}  Max occupancy: {max_occ:.3f}   Avg occupancy: {avg_occ:.3f}")
+    f.Close()
