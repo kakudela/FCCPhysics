@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 import ROOT, argparse, glob, os, logging
 ROOT.gROOT.SetBatch(True); ROOT.gStyle.SetOptStat(0)
 
