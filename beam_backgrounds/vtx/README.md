@@ -1,16 +1,11 @@
 ___________________________________________________________________________________
-___________________________________________________________________________________
-
 DDSIM ANALYSIS STUFF!
 
-Detector: CLD_o2_v07.
-source "/cvmfs/sw.hsf.org/key4hep/setup.sh -r 2025-05-29"
-
-___________________________________________________________________________________
+Detector: `CLD_o2_v07.`
+`source "/cvmfs/sw.hsf.org/key4hep/setup.sh -r 2025-05-29"`
 ___________________________________________________________________________________
 
-
-analysis.py
+`analysis.py`
 
 Runs analysis for DDSim outputs, producing VTX + GEN histograms and occupancy numbers.
 
@@ -22,24 +17,24 @@ Runs analysis for DDSim outputs, producing VTX + GEN histograms and occupancy nu
 
 - Core workflow:
   -> Discover + sanity-check input files
-     - Globs ddsim_*.root and ddsim0_*.root
-     - Uses functions.py file pruning helpers to skip zombies / missing trees
+     - Globs `ddsim_*.root` and `ddsim0_*.root`
+     - Uses `functions.py` file pruning helpers to skip zombies / missing trees
   -> Build RDataFrame over the "events" tree
      - Produces derived columns (hit kinematics, MC kinematics, selections)
      - Fills TH1/TH2 histograms (UNNORMALIZED; i.e. raw counts across all events)
   -> Digitize L1 barrel simhits (geometric pixel mapping)
-     - Calls digitizer_simHit.h routines to map SimTrackerHits -> PixelDigi(row,col,adc)
+     - Calls `digitizer_simHit.h` routines to map SimTrackerHits -> PixelDigi(row,col,adc)
      - Counts digis per event and per local window (for occupancy proxies)
   -> Compute scalar summary numbers
      - n_events and per-event averages (avg simhits, avg unique MC, etc.)
      - global occupancy and local occupancy (avg and p95; written as scalars)
-     - fractions such as “frac_mc_sel_with_l1hit”
+     - fractions such as `frac_mc_sel_with_l1hit`
   -> Persist outputs
      - Writes one ROOT output file per stream (pairs / pairs0) containing:
        * all TH1/TH2 histograms (raw/unscaled)
-       * scalar parameters as TParameter<...> (and small text summaries)
+       * scalar parameters as `TParameter<...>` (and small text summaries)
      - Writes PNG plots into the corresponding public_html directory structure and
-       auto-copies index.php into each directory via ensure_public_dir(...) / ensure_index_php(...)
+       auto-copies index.php into each directory via `ensure_public_dir(...)` / `ensure_index_php(...)`
 
 - Plotting behavior:
   - Default mode: fills + writes ROOT outputs AND produces PNGs
@@ -54,123 +49,111 @@ Runs analysis for DDSim outputs, producing VTX + GEN histograms and occupancy nu
 - Output locations:
   - ROOT output file is written into the same directory tree as the PNGs (per stream).
   - VTX plots go under:
-      /home/submit/kudela/public_html/fccee/beam_background/ddsim/vtx/<dataset>/<stream>/
+      `/home/submit/kudela/public_html/fccee/beam_background/ddsim/vtx/<dataset>/<stream>/`
     GEN plots go under:
-      /home/submit/kudela/public_html/fccee/beam_background/ddsim/gen/<dataset>/<stream>/
+      `/home/submit/kudela/public_html/fccee/beam_background/ddsim/gen/<dataset>/<stream>/`
   - The canonical ROOT output name pattern is:
-      <dataset>_ddsim_analysis.root
+      `<dataset>_ddsim_analysis.root`
 
 - Key point for downstream scripts:
   - Histograms are NOT per-event normalized in analysis.py.
-    compare.py and other consumers must divide by n_events when they want per-event rates.
-  - Scalar summaries are stored as TParameter and are read by occupancy_studies.py.
-
-
-___________________________________________________________________________________
+    `compare.py` and other consumers must divide by n_events when they want per-event rates.
+  - Scalar summaries are stored as TParameter and are read by `occupancy_studies.py.`
+  
 ___________________________________________________________________________________
 
+`compare.py`
 
-compare.py
-
-Overlays and compares 1D histograms produced by analysis.py across multiple samples.
+Overlays and compares 1D histograms produced by `analysis.py` across multiple samples.
 
 - Inputs:
-  - A group = { samples[], plots[], outdir }
+  - A `group = { samples[], plots[], outdir }`
   - Each sample points to an analysis.py ROOT output file
 
 - Key behavior:
-  - analysis.py histograms are raw (not per-event). compare.py always divides by n_events
-    (read from TParameter<int>("n_events") in the ROOT file; fallback to 1).
+  - `analysis.py` histograms are raw (not per-event). compare.py always divides by n_events
+    (read from `TParameter<int>("n_events")` in the ROOT file; fallback to 1).
   - Two normalization modes:
       * per_event: only divide by n_events
       * unit_area: divide by n_events AND normalize histogram to unit integral
 
 - Plotting:
-  - Clones hists out of the file (TH1.AddDirectory(False) behavior)
+  - Clones hists out of the file (`TH1.AddDirectory(False)` behavior)
   - Applies consistent styling + optional legend placement overrides
-  - Optional x_range trimming for view and for ymax estimation
+  - Optional `x_range` trimming for view and for `ymax` estimation
   - Saves PNGs to:
-      /home/submit/kudela/public_html/fccee/beam_background/ddsim/compare
+      `/home/submit/kudela/public_html/fccee/beam_background/ddsim/compare`
     and ensures index.php is present.
-
-
-___________________________________________________________________________________
+  
 ___________________________________________________________________________________
 
+`occupancy_studies.py`
 
-occupancy_studies.py
-
-Reads scalar parameters written by analysis.py and makes “parameter vs x” plots for
+Reads scalar parameters written by `analysis.py` and makes “parameter vs x” plots for
 multiple independent studies (B-field scans, grid scans, granularity scans, etc).
 
 - Inputs:
   - A study is defined by a list of points: (x value, ROOT file path)
-  - ROOT files are analysis.py outputs (…_ddsim_analysis.root)
+  - ROOT files are analysis.py outputs (`…_ddsim_analysis.root`)
 
 - Expected ROOT contents (scalars):
-  Scalars are stored as TParameter<...> with exact names like:
-    avg_simhits_barrel_l1
-    avg_unique_mc_barrel_l1
-    avg_simhits_endcap_l1
-    avg_unique_mc_endcap_l1
-    avg_global_occupancy_u6
-    p95_global_occupancy_u6
-    frac_mc_sel_with_l1hit
+  Scalars are stored as `TParameter<...>` with exact names like:
+    `avg_simhits_barrel_l1`
+    `avg_unique_mc_barrel_l1`
+    `avg_simhits_endcap_l1`
+    `avg_unique_mc_endcap_l1`
+    `avg_global_occupancy_u6`
+    `p95_global_occupancy_u6`
+    `frac_mc_sel_with_l1hit`
 
 - Reader behavior:
-  - Reads TParameter via GetVal()
-  - Fallback: supports TNamed with a numeric Title/Name
+  - Reads `TParameter` via `GetVal()`
+  - Fallback: supports `TNamed` with a numeric Title/Name
   - If a point is missing a parameter, that point is skipped for that plot.
 
-
-___________________________________________________________________________________
 ___________________________________________________________________________________
 
+`functions.py`
 
-functions.py
-
-Python-side utilities used across analysis.py, occupancy_studies.py, and compare.py.
+Python-side utilities used across `analysis.py`, `occupancy_studies.py`, and `compare.py`.
 
 - Directory / web output helpers:
-  - ensure_dir: mkdir -p
-  - ensure_index_php: copies index.php into a directory once
-  - ensure_public_dir: constructs nested public_html paths and ensures index.php exists
+  - `ensure_dir`: `mkdir -p`
+  - `ensure_index_php`: copies `index.php` into a directory once
+  - `ensure_public_dir`: constructs nested `public_html` paths and ensures `index.php` exists
 
 - Histogram saving helpers:
-  - save_hist1d: clones hist, optional scaling, axis labels, optional log-y, x-buffering
-  - save_hist2d: clones hist, optional scaling, axis labels, buffers x/y, draws COLZ,
+  - `save_hist1d`: clones hist, optional scaling, axis labels, optional log-y, x-buffering
+  - `save_hist2d`: clones hist, optional scaling, axis labels, buffers x/y, draws COLZ,
     forces no stats box for 2D plots
-  - save_hist2d_with_box: same as save_hist2d but overlays a red TBox in user coords
+  - `save_hist2d_with_box`: same as `save_hist2d` but overlays a red TBox in user coords
 
 - Occupancy math helpers:
-  - sensor_area_mm2, pixel_area_mm2
-  - hist_mean_and_p95
-  - compute_occ_from_hist: avg/p95 hits and converts → occupancy proxy
-  - compute_global_occ_from_hits: hit count → occupancy proxy
+  - `sensor_area_mm2`, `pixel_area_mm2`
+  - `hist_mean_and_p95`
+  - `compute_occ_from_hist`: avg/p95 hits and converts -> occupancy proxy
+  - `compute_global_occ_from_hits`: hit count -> occupancy proxy
 
 - Text output helper:
-  - write_text: writes per-run summary text files
+  - `write_text`: writes per-run summary text files
 
 - File health / pruning:
-  - filter_good_files: opens each ROOT file and checks tree existence, drops zombies
-  - weed_files_on_open: attempts to build an RDataFrame; if it fails, removes the
+  - `filter_good_files`: opens each ROOT file and checks tree existence, drops zombies
+  - `weed_files_on_open`: attempts to build an RDataFrame; if it fails, removes the
     offending file (or trims) to avoid analysis crashes on truncated files
 
-
-___________________________________________________________________________________
 ___________________________________________________________________________________
 
-
-functions.h
+`functions.h`
 
 Serves as a lightweight C++ helper library for ROOT RDataFrame, providing compiled
 accessors and small algorithms used heavily by analysis.py.
 
-- Defines RVec-based type aliases (Vec_f, Vec_i, Vec_b, etc.) and edm4hep
-  collection aliases for SimTrackerHitData and MCParticleData, allowing concise
+- Defines RVec-based type aliases (`Vec_f`, `Vec_i`, `Vec_b`, etc.) and `edm4hep`
+  collection aliases for `SimTrackerHitData` and `MCParticleData`, allowing concise
   RDataFrame Define(...) expressions.
 
-- Provides fast getters for SimTrackerHit quantities:
+- Provides fast getters for `SimTrackerHit` quantities:
   hit positions (x,y,z,r,phi,theta), energy deposition, momentum components, and
   secondary/primary tagging via the simhit quality bits.
 
@@ -187,20 +170,17 @@ accessors and small algorithms used heavily by analysis.py.
   counting unique MCs with ≥1 hit, per-MC hit multiplicity, and consecutive-hit
   delta calculations (dz, dphi) for studying hit correlations.
 
-- Implements consecutive-hit merging (the “dedup25um” logic):
+- Implements consecutive-hit merging (the “`dedup25um`” logic):
   hits from the same MC particle that lie within a configurable spatial radius
-  (25 um in analysis.py) are merged to suppress artificial hit splitting.
+  (25 um in `analysis.py`) are merged to suppress artificial hit splitting.
 
 - Includes geometry-derived helpers such as the barrel incidence angle, computed
   relative to the local radial normal.
 
 All functions are header-only and are JIT-compiled once via
-ROOT.gInterpreter.Declare() at runtime.
-
+`ROOT.gInterpreter.Declare()` at runtime.
 
 ___________________________________________________________________________________
-___________________________________________________________________________________
-
 
 digitizer_simHit.h
 
@@ -256,7 +236,7 @@ SimHit -> PixelDigi mapping
 Barrel digitization:
     DigitizerSimHitBarrel(...)
 
-Inputs (from analysis.py):
+Inputs (from `analysis.py`):
 - x, y, z hit positions (mm), already filtered to L1 inner barrel
 - hit energy deposition (GeV)
 - pixel pitch and barrel geometry
@@ -280,7 +260,7 @@ Procedure for each SimTrackerHit:
 Each accepted SimTrackerHit produces exactly one digi.
 
 Endcap digitization:
-    DigitizerSimHitEndcap(...)
+    `DigitizerSimHitEndcap(...)`
 
 Differences from barrel:
 - Hit must satisfy zLo ≤ |z| < zHi
@@ -289,15 +269,15 @@ Differences from barrel:
 - row/col are computed from x/y instead of r–phi/z
 
 -----------------------------------------------
-Connection to analysis.py (global hits)
+Connection to `analysis.py` (global hits)
 
-In analysis.py, digitization is applied only to L1 inner barrel hits:
+In `analysis.py`, digitization is applied only to L1 inner barrel hits:
 
-    b_digis = DigitizerSimHitBarrel(...)
-    global_tot_hits = b_digis.size()
+    `b_digis = DigitizerSimHitBarrel(...)`
+    `global_tot_hits = b_digis.size()`
 
 Thus:
-- global_tot_hits = number of digis per event
+- `global_tot_hits` = number of digis per event
 - this is the raw input for the “global occupancy” calculation
 
 analysis.py then converts this count into an occupancy proxy by:
@@ -306,15 +286,15 @@ analysis.py then converts this count into an occupancy proxy by:
 - inflating by cluster_size and safety_factor
 
 The digitizer itself does not compute occupancies — it provides the
-hit counts on which analysis.py operates.
+hit counts on which `analysis.py` operates.
 
 -----------------------------------------------
 Local occupancy via windowed hit maps
 
 Local hit density is computed using:
 
-    getOccupancyBarrel(...)
-    getOccupancyPlanar(...)
+    `getOccupancyBarrel(...)`
+    `getOccupancyPlanar(...)`
 
 These functions:
 - divide the sensor into a grid of windows
@@ -335,11 +315,11 @@ Return value (Vec_f of size 3):
 - [2] = total number of digis
 
 -----------------------------------------------
-How local occupancy is formed in analysis.py
+How local occupancy is formed in `analysis.py`
 
-analysis.py uses only the *maximum* window hit count:
+`analysis.py` uses only the *maximum* window hit count:
 
-    local_max_hits = occ_cfg[0]
+    `local_max_hits = occ_cfg[0]`
 
 This is converted to an occupancy estimate via:
 
@@ -366,8 +346,4 @@ Key simplifying assumptions
 
 This digitizer is intentionally minimal and fast, designed to study
 relative occupancy trends as a function of beam background conditions,
-granularity, and magnetic field — not detailed detector response.
-
-
-___________________________________________________________________________________
-___________________________________________________________________________________
+granularity, and magnetic field - not detailed detector response.
