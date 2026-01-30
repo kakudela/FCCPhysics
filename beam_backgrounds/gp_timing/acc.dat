@@ -1,0 +1,65 @@
+$ACCELERATOR:: FCCee_Z_GHC_V25p1
+{
+energy=45.6;
+particles=21.80;
+beta_x=110.00;
+beta_y=0.70;
+dist_z.1=0;dist_z.2=0;
+sigma_x=8837.42;
+sigma_y=38.34;
+sigma_z=15200.00;
+offset_x=0.0;
+offset_y=0.0;
+n_b=1;
+f_rep=1;
+angle_x=-0.015;
+charge_sign=-1;
+}
+
+
+$PARAMETERS:: TEST_PAR
+{
+rndm_save=0;
+n_x=128;
+n_y=128;
+n_z=128;
+n_t=1;
+cut_x=150*sigma_x.1;
+cut_y=60.0*sigma_y.1;
+cut_z=2.0*sigma_z.1 ;
+n_m= 100000;
+electron_ratio=1;
+do_eloss = 1;
+store_beam=1;
+electron_ratio=1. ;
+do_photons=1 ;
+photon_ratio=1. ;
+store_photons=1 ;
+do_pairs= 1;
+track_pairs=1;
+store_pairs=2;
+pair_ecut = 0.000511;
+hadron_ratio=100000;
+do_hadrons=0;
+store_hadrons=0;
+grids=8;
+beam_size = 1;
+pair_q2 = 2 ;
+pair_ratio = 1.;
+do_lumi=0;
+num_lumi=200000 ;
+lumi_p=1e-28;
+do_bhabhas=0;
+bhabha_scal=5*1e-29;
+bhabha_ecmload=91.2;
+rndm_seed=0;
+load_events=0;
+do_dump=0;
+dump_step=n_z-1;
+bfield_z=-2.0;
+beam_fields_on_pairs=1;
+beampipe_r=10.0;
+do_edm4hep=1;
+do_muons=0;
+track_muons=0;
+}
