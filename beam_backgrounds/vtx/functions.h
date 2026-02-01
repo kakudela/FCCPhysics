@@ -427,6 +427,76 @@ Vec_f getBarrelIncidenceAngleDeg(const Vec_f& x, const Vec_f& y, const Vec_f& px
     return out;
 }
 
+Vec_f getBarrelIncidenceAnglePhiDeg(const Vec_f& x, const Vec_f& y, const Vec_f& px_in, const Vec_f& py_in, const Vec_f& pz_in){
+    const int n = std::min({(int)x.size(), (int)y.size(), (int)px_in.size(), (int)py_in.size(), (int)pz_in.size()});
+    Vec_f out; out.reserve(n);
+
+    for(int i=0;i<n;++i){
+        const double nx = (double)x[i];
+        const double ny = (double)y[i];
+        const double nr = std::sqrt(nx*nx + ny*ny);
+
+        const double px = (double)px_in[i];
+        const double py = (double)py_in[i];
+        const double pt = std::sqrt(px*px + py*py);
+
+        if(nr <= 0.0 || pt <= 0.0){
+            out.push_back(0.0f);
+            continue;
+        }
+
+        const double nhx = nx / nr;
+        const double nhy = ny / nr;
+
+        const double phx = px / pt;
+        const double phy = py / pt;
+
+        double c = nhx*phx + nhy*phy;
+        c = std::max(-1.0, std::min(1.0, c));
+        const double ang = std::acos(c) * 180.0 / M_PI;
+        out.push_back((float)ang);
+    }
+    return out;
+}
+
+Vec_f getBarrelIncidenceAngleThetaDeg(const Vec_f& x, const Vec_f& y, const Vec_f& px_in, const Vec_f& py_in, const Vec_f& pz_in){
+    const int n = std::min({(int)x.size(), (int)y.size(), (int)px_in.size(), (int)py_in.size(), (int)pz_in.size()});
+    Vec_f out; out.reserve(n);
+
+    for(int i=0;i<n;++i){
+        const double nx = (double)x[i];
+        const double ny = (double)y[i];
+        const double nr = std::sqrt(nx*nx + ny*ny);
+
+        const double px = (double)px_in[i];
+        const double py = (double)py_in[i];
+        const double pz = (double)pz_in[i];
+
+        if(nr <= 0.0){
+            out.push_back(0.0f);
+            continue;
+        }
+
+        // radial component of momentum (projection onto r-hat)
+        const double pr = (nx*px + ny*py) / nr;
+
+        // momentum projected into r-z plane
+        const double prm = std::sqrt(pr*pr + pz*pz);
+        if(prm <= 0.0){
+            out.push_back(0.0f);
+            continue;
+        }
+
+        // angle between +r direction and (pr, pz)
+        double c = pr / prm;
+        c = std::max(-1.0, std::min(1.0, c));
+        const double ang = std::acos(c) * 180.0 / M_PI;
+        out.push_back((float)ang);
+    }
+    return out;
+}
+
+
 // Elementwise safe division: out[i] = (den[i] != 0) ? num[i]/den[i] : 0
 Vec_f vecDiv(const Vec_f& num, const Vec_f& den) {
     Vec_f out;

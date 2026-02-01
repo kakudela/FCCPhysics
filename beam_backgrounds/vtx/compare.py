@@ -1,17 +1,40 @@
 import os
 import shutil
 import ROOT
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument( "--clean", action="store_true", help="Delete compare output directory before plotting")
+args, _unknown = parser.parse_known_args()
 
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
 ROOT.TH1.AddDirectory(False)
 
 index_php_src = "/home/submit/kudela/public_html/fccee/beam_background/index.php"
-
 # Helpers
 def ensure_dir(d):
     os.makedirs(d, exist_ok=True)
     try_copy_index_php(d)
+
+
+def clear_dir_contents(d):
+    if not d:
+        return
+    d = os.path.abspath(d)
+    if not os.path.isdir(d):
+        return
+
+    for name in os.listdir(d):
+        p = os.path.join(d, name)
+        try:
+            if os.path.isdir(p) and not os.path.islink(p):
+                shutil.rmtree(p)
+            else:
+                os.unlink(p)
+        except Exception as e:
+            print(f"[warn] could not remove '{p}': {e}")
+
 
 
 def try_copy_index_php(d):
@@ -266,7 +289,7 @@ def overlay_1d(plot, samples, out_png, show_legend=True, group_legend_pos=None, 
         elif legend_pos_resolved == "bl":
             leg = make_legend(0.14, 0.14, 0.44, 0.36, len(hists))
         elif legend_pos_resolved == "tc":
-            leg = make_legend(0.45, 0.67, 0.65, 0.87, len(hists))
+            leg = make_legend(0.45, 0.70, 0.65, 0.90, len(hists))
         elif legend_pos_resolved == "cc":
             leg = make_legend(0.50, 0.43, 0.65, 0.63, len(hists))
         else:
@@ -311,10 +334,12 @@ def run_group(group):
             group_legend_style=group_legend_style,
         )
 
-
-
 def main():
     outdir = "/home/submit/kudela/public_html/fccee/beam_background/ddsim/compare"
+    ensure_dir(outdir)
+    if args.clean:
+        clear_dir_contents(outdir)
+        ensure_dir(outdir)  # restore index.php
 
     group_mult = {
         "outdir": outdir,
@@ -378,10 +403,11 @@ def main():
         "legend_pos": "tc",
         "legend_style": "l",
         "samples": [
-            {"label": "original", "path": "/home/submit/kudela/public_html/fccee/beam_background/ddsim/vtx/FCCee_Z_GHC_V25p1_FCCee_Z128_0T_grids8_noBoundary/pairs/FCCee_Z_GHC_V25p1_FCCee_Z128_0T_grids8_noBoundary_ddsim_analysis.root"},
-            {"label": "pairs0",   "path": "/home/submit/kudela/public_html/fccee/beam_background/ddsim/vtx/FCCee_Z_GHC_V25p1_FCCee_Z128_2T_grids8/pairs0/FCCee_Z_GHC_V25p1_FCCee_Z128_2T_grids8_ddsim_analysis.root"},
-            {"label": "vtx000",   "path": "/home/submit/kudela/public_html/fccee/beam_background/ddsim/vtx/FCCee_Z_GHC_V25p1_FCCee_Z128_0T_grids8_vtx000/pairs/FCCee_Z_GHC_V25p1_FCCee_Z128_0T_grids8_vtx000_ddsim_analysis.root"},
-            {"label": "final fix","path": "/home/submit/kudela/public_html/fccee/beam_background/ddsim/vtx/FCCee_Z_GHC_V25p1_FCCee_Z128_2T_grids8/pairs/FCCee_Z_GHC_V25p1_FCCee_Z128_2T_grids8_ddsim_analysis.root"},
+            {"label": "ORIGINAL", "path": "/home/submit/kudela/public_html/fccee/beam_background/ddsim/vtx/FCCee_Z_GHC_V25p1_FCCee_Z128_0T_grids8_noBoundary/pairs/FCCee_Z_GHC_V25p1_FCCee_Z128_0T_grids8_noBoundary_ddsim_analysis.root"},
+            {"label": "0T GRIDS8","path": "/home/submit/kudela/public_html/fccee/beam_background/ddsim/vtx/FCCee_Z_GHC_V25p1_FCCee_Z128_0T_grids8_2T_ddsim/pairs/FCCee_Z_GHC_V25p1_FCCee_Z128_0T_grids8_2T_ddsim_ddsim_analysis.root"},
+            {"label": "PAIRS0",   "path": "/home/submit/kudela/public_html/fccee/beam_background/ddsim/vtx/FCCee_Z_GHC_V25p1_FCCee_Z128_2T_grids8/pairs0/FCCee_Z_GHC_V25p1_FCCee_Z128_2T_grids8_ddsim_analysis.root"},
+            {"label": "VTX000",   "path": "/home/submit/kudela/public_html/fccee/beam_background/ddsim/vtx/FCCee_Z_GHC_V25p1_FCCee_Z128_0T_grids8_vtx000/pairs/FCCee_Z_GHC_V25p1_FCCee_Z128_0T_grids8_vtx000_ddsim_analysis.root"},
+            {"label": "2T GRIDS8","path": "/home/submit/kudela/public_html/fccee/beam_background/ddsim/vtx/FCCee_Z_GHC_V25p1_FCCee_Z128_2T_grids8/pairs/FCCee_Z_GHC_V25p1_FCCee_Z128_2T_grids8_ddsim_analysis.root"},
         ],
         "plots": [
             # barrel L1 (per-event)
@@ -436,6 +462,43 @@ def main():
                 "y_title": "unit area",
                 "legend_pos": "tr",
             },
+            {
+                "hist": "incidence_angle_phi_deg_barrel_l1",
+                "out": "incidence_angle_phi_deg_barrel_l1.png",
+                "norm": "per_event",
+                "title": "",
+                "x_title": "incidence angle (phi component) wrt radial normal (degrees)",
+                "y_title": "entries per event",
+                "legend_pos": "tr",
+            },
+            {
+                "hist": "incidence_angle_phi_deg_barrel_l1",
+                "out": "incidence_angle_phi_deg_barrel_l1_unit_area.png",
+                "norm": "unit_area",
+                "title": "",
+                "x_title": "incidence angle (phi component) wrt radial normal (degrees)",
+                "y_title": "unit area",
+                "legend_pos": "tr",
+            },
+            {
+                "hist": "incidence_angle_theta_deg_barrel_l1",
+                "out": "incidence_angle_theta_deg_barrel_l1.png",
+                "norm": "per_event",
+                "title": "",
+                "x_title": "incidence angle (theta component) wrt radial normal (degrees)",
+                "y_title": "entries per event",
+                "legend_pos": "tr",
+            },
+            {
+                "hist": "incidence_angle_theta_deg_barrel_l1",
+                "out": "incidence_angle_theta_deg_barrel_l1_unit_area.png",
+                "norm": "unit_area",
+                "title": "",
+                "x_title": "incidence angle (theta component) wrt radial normal (degrees)",
+                "y_title": "unit area",
+                "legend_pos": "tr",
+            },
+
         ]
     }
 

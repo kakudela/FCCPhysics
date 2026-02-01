@@ -30,7 +30,7 @@ public_ddsim_base = "/home/submit/kudela/public_html/fccee/beam_background/ddsim
 # (input_dir, bfield_T)
 # note that the detector B-field is only used for calculating the VTX acceptance box on the theta-pT plot in this script
 default_input_dirs = [
-    ("/ceph/submit/data/group/fcc/ee/detector/guineapig_studies/FCCee_Z_GHC_V25p1_FCCee_Z512_2T_grids8", 2.0),
+    # ("/ceph/submit/data/group/fcc/ee/detector/guineapig_studies/FCCee_Z_GHC_V25p1_FCCee_Z512_2T_grids8", 2.0),
     # ("/ceph/submit/data/group/fcc/ee/detector/guineapig_studies/FCCee_Z_GHC_V25p1_FCCee_Z256_2T_grids8", 2.0),
     # ("/ceph/submit/data/group/fcc/ee/detector/guineapig_studies/FCCee_Z_GHC_V25p1_FCCee_Z320_2T_grids8", 2.0),
     # ("/ceph/submit/data/group/fcc/ee/detector/guineapig_studies/FCCee_Z_GHC_V25p1_FCCee_Z64_2T_grids8", 2.0),
@@ -82,7 +82,9 @@ default_input_dirs = [
     # ("/ceph/submit/data/group/fcc/ee/detector/guineapig_studies/FCCee_Z_GHC_V25p1_FCCee_Z128_3T_grids8", 3.0),
     # ("/ceph/submit/data/group/fcc/ee/detector/guineapig_studies/FCCee_Z_GHC_V25p1_FCCee_Z128_4T_grids8", 4.0),
 
+    ("/ceph/submit/data/group/fcc/kudela/guineapig_studies/CLD_o2_v07_2T/FCCee_Z_GHC_V25p1_FCCee_Z128_0T_grids8_2T_ddsim", 2.0),
     # ("/ceph/submit/data/group/fcc/kudela/guineapig_studies/FCCee_Z_GHC_V25p1_FCCee_Z128_0T_grids8_vtx000", 2.0),
+
     # ("/ceph/submit/data/group/fcc/kudela/ddsim/guineapig_orig/CLD_o2_v07_2T/FCCee_Z_4IP_04may23_FCCee_Z128", 2.0),
 ]
 
@@ -109,8 +111,8 @@ l1_r_min_mm, l1_r_max_mm = 13.0, 15.0
 l2_r0_mm, l3_r0_mm = 36.0, 58.0
 l23_tol_mm = 4.0
 
-bins_phi_360 = (200, 0.0, 200.0)
-bins_theta_deg = (200, 0.0, 200.0)
+bins_phi_360 = (180, 0.0, 360.0)
+bins_theta_deg = (120, 0.0, 180.0)
 bins_costheta = (50, -1.0, 1.0)
 
 bins_z_barrel = (110, -120.0, 120.0)
@@ -171,7 +173,7 @@ def collect_files(input_dir, maxfiles):
         b = os.path.basename(f)
         if b.startswith("ddsim0_") and b.endswith(".root"):
             pairs0.append(f)
-        elif b.startswith("output_") and b.endswith("sim.root"):
+        elif b.startswith("ddsim_") and b.endswith(".root"):
             pairs.append(f)
 
     if maxfiles > 0:
@@ -259,6 +261,9 @@ def make_plot_labels(occ_configs, pix_pitch_x_um, pix_pitch_y_um):
         "hit_p_mev_abs_barrel_l1": "abs(p) (mev)",
 
         "incidence_angle_deg_barrel_l1": "incidence angle wrt radial normal (degrees)",
+        "incidence_angle_phi_deg_barrel_l1": "incidence angle (phi component) wrt radial normal (degrees)",
+        "incidence_angle_theta_deg_barrel_l1": "incidence angle (theta component) wrt radial normal (degrees)",
+
         "hits_per_layer_barrel_3layers": "barrel layer",
 
         "global_hits_total": "digis per event (L1 inner barrel)",
@@ -610,6 +615,10 @@ def run_one_stream(input_dir, files, stream, threads, bfield_t):
     df = df.Define("b_l1_pz_gev_dir", "getSimHitMomentum_z(VertexBarrelCollection)[b_l1inner_mask]")
     df = df.Define("b_l1_inc_deg", "getBarrelIncidenceAngleDeg(b_x[b_l1inner_mask], b_y[b_l1inner_mask], b_l1_px_gev_dir, b_l1_py_gev_dir, b_l1_pz_gev_dir)")
 
+    df = df.Define("b_l1_inc_phi_deg", "getBarrelIncidenceAnglePhiDeg(b_x[b_l1inner_mask], b_y[b_l1inner_mask], b_l1_px_gev_dir, b_l1_py_gev_dir, b_l1_pz_gev_dir)")
+    df = df.Define("b_l1_inc_theta_deg", "getBarrelIncidenceAngleThetaDeg(b_x[b_l1inner_mask], b_y[b_l1inner_mask], b_l1_px_gev_dir, b_l1_py_gev_dir, b_l1_pz_gev_dir)")
+
+
     df = df.Define("n_hits_b_l1", "static_cast<int>(b_l1_z.size())")
 
     # r zoom
@@ -799,6 +808,9 @@ def run_one_stream(input_dir, files, stream, threads, bfield_t):
 
     # incidence
     h1_book("incidence_angle_deg_barrel_l1", bins_incidence_deg, "b_l1_inc_deg")
+    h1_book("incidence_angle_phi_deg_barrel_l1", bins_incidence_deg, "b_l1_inc_phi_deg")
+    h1_book("incidence_angle_theta_deg_barrel_l1", bins_incidence_deg, "b_l1_inc_theta_deg")
+
 
     # hits-per-layer
     h1_book("hits_per_layer_barrel_3layers", (3, -0.5, 2.5), "b_layer3_sel_valid")

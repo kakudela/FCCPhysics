@@ -59,7 +59,7 @@ Runs analysis for DDSim outputs, producing VTX + GEN histograms and occupancy nu
   - Histograms are NOT per-event normalized in analysis.py.
     `compare.py` and other consumers must divide by n_events when they want per-event rates.
   - Scalar summaries are stored as TParameter and are read by `occupancy_studies.py.`
-  
+
 ___________________________________________________________________________________
 
 `compare.py`
@@ -84,7 +84,7 @@ Overlays and compares 1D histograms produced by `analysis.py` across multiple sa
   - Saves PNGs to:
       `/home/submit/kudela/public_html/fccee/beam_background/ddsim/compare`
     and ensures index.php is present.
-  
+
 ___________________________________________________________________________________
 
 `occupancy_studies.py`

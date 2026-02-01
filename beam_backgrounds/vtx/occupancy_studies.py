@@ -2,6 +2,11 @@ import os
 import shutil
 import math
 import ROOT
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--clean", action="store_true", help="Delete contents of output directories before replotting")
+args = parser.parse_args()
 
 ROOT.gROOT.SetBatch(True)
 ROOT.gStyle.SetOptStat(0)
@@ -11,8 +16,42 @@ index_php_src = "/home/submit/kudela/public_html/fccee/beam_background/index.php
 # helpers:
 
 def ensure_dir(d: str):
+    d = os.path.abspath(d)
     os.makedirs(d, exist_ok=True)
-    try_copy_index_php(d)
+
+    anchor = "/home/submit/kudela/public_html/fccee"
+    if not d.startswith(anchor + os.sep) and d != anchor:
+        try_copy_index_php(d)
+        return
+
+    rel = os.path.relpath(d, anchor)
+    cur = anchor
+    try_copy_index_php(cur)
+    if rel == ".":
+        return
+
+    for part in rel.split(os.sep):
+        cur = os.path.join(cur, part)
+        os.makedirs(cur, exist_ok=True)
+        try_copy_index_php(cur)
+
+def clear_dir_contents(d: str):
+    if not d:
+        return
+    d = os.path.abspath(d)
+    if not os.path.isdir(d):
+        return
+
+    for name in os.listdir(d):
+        p = os.path.join(d, name)
+        try:
+            if os.path.isdir(p) and not os.path.islink(p):
+                shutil.rmtree(p)
+            else:
+                os.unlink(p)
+        except Exception as e:
+            print(f"[warn] could not remove '{p}': {e}")
+
 
 
 def try_copy_index_php(d: str):
@@ -177,6 +216,8 @@ def plot_param_vs_x(
     gr.SetMarkerStyle(int(marker_style))
     gr.SetMarkerSize(float(marker_size))
     gr.SetLineWidth(2)
+    gr.SetLineColor(ROOT.kBlue)
+    gr.SetMarkerColor(ROOT.kBlue)
 
     # Ranges
     if x_range is None:
@@ -196,12 +237,17 @@ def plot_param_vs_x(
     c.SetBottomMargin(0.12)
     c.SetTopMargin(0.08)
     c.SetLogy(False)
+    gr.SetLineColor(ROOT.kBlue)
+    gr.SetMarkerColor(ROOT.kBlue)
+    gr.SetLineWidth(2)
 
-    frame = c.DrawFrame(xmin, ymin, xmax, ymax)
-    frame.GetXaxis().SetTitle(x_title)
-    frame.GetYaxis().SetTitle(y_title)
+    gr.SetTitle(f";{x_title};{y_title}")
+    gr.GetXaxis().SetLimits(xmin, xmax)
+    gr.SetMinimum(ymin)
+    gr.SetMaximum(ymax)
 
-    gr.Draw("PL" if connect else "P")
+    gr.Draw("ALP" if connect else "AP")
+
     draw_title(c, title)
 
     ensure_dir(os.path.dirname(out_png))
@@ -227,6 +273,11 @@ def run_study(study: dict, param_defs: list):
     y_overrides = study.get("y_overrides", {})  # per-param overrides
 
     ensure_dir(outdir)
+
+    if args.clean:
+        clear_dir_contents(outdir)
+        ensure_dir(outdir)  # re-add index.php after wipe
+
 
     for pd in param_defs:
         param = pd["param"]
@@ -287,7 +338,7 @@ def main():
     studies = [
         {
             "name": "granularity_scan_2T",
-            "outdir": "/home/submit/kudela/public_html/fccee/beam_background/ddsim/occupancy_studies/grid_granularity/2T",
+            "outdir": "/home/submit/kudela/public_html/fccee/beam_background/ddsim/occupancy_studies/grid_granularity",
             "x_title": "number of grid divisions per axis (n)",
             "connect": True,
             "points": [
